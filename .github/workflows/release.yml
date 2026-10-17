@@ -1,0 +1,54 @@
+name: Build and publish tagged beta
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  package-release:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'Release v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify module syntax and tests
+        run: |
+          npm run check
+          npm test
+      - name: Assemble and verify version-matched package
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p 'require("./module.json").version')"
+          TAG="v${VERSION}"
+          NAME="foundry-nav-order-${VERSION}.zip"
+          node -e 'const m=require("./module.json"); const base="https://github.com/rebsiot/navbar-customizer/releases/download/v"+m.version+"/"; if(m.id!=="foundry-nav-order" || m.manifest!==base+"module.json" || m.download!==base+"foundry-nav-order-"+m.version+".zip") process.exit(1)'
+          mkdir -p dist
+          zip -q -r "dist/${NAME}" module.json scripts styles README.md CHANGELOG.md
+          unzip -tq "dist/${NAME}"
+          test "$(unzip -Z1 "dist/${NAME}" | grep -cx 'module.json')" -eq 1
+          cp module.json dist/module.json
+          echo "RELEASE_TAG=${TAG}" >> "$GITHUB_ENV"
+          echo "RELEASE_ZIP=dist/${NAME}" >> "$GITHUB_ENV"
+      - name: Publish prerelease with pinned manifest and ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release ${RELEASE_TAG} already exists. Refusing to replace its artifacts."
+            exit 1
+          fi
+          gh release create "$RELEASE_TAG" "$RELEASE_ZIP" dist/module.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Foundry Navigation Organizer ${RELEASE_TAG} (Beta)" \
+            --notes-file RELEASE-NOTES.md

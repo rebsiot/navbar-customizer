@@ -1,0 +1,10 @@
+{
+  "name": "foundry-nav-order",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check scripts/layout.mjs && node --check scripts/runtime.mjs && node --check scripts/organizer.mjs && node --check scripts/main.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

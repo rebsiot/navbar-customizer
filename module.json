@@ -1,0 +1,25 @@
+{
+  "id": "foundry-nav-order",
+  "title": "Foundry Navigation Organizer",
+  "description": "Arrange left scene controls, their tools, and right sidebar tabs separately; each user saves their own layout.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "14"
+  },
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "styles": [
+    "styles/organizer.css"
+  ],
+  "authors": [
+    {
+      "name": "St. Louis v2 toolkit"
+    }
+  ],
+  "url": "https://github.com/rebsiot/navbar-customizer",
+  "manifest": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.0/module.json",
+  "download": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.0/foundry-nav-order-0.1.0.zip",
+  "readme": "README.md",
+  "changelog": "CHANGELOG.md"
+}
