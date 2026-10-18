@@ -102,7 +102,7 @@ export class NavOrganizerApp extends ApplicationV2 {
     const container = document.createElement("div");
     container.className = "fno-panel";
     container.innerHTML = `
-      <p class="fno-intro">Drag rows or use the arrows to reorder. If your GM permits, use the eye button to hide or show an icon. Visibility, order and colors are saved separately for your user.</p>
+      <p class="fno-intro">Drag rows or use the arrows to reorder. Changes are saved automatically for your user in this world. If your GM permits, use the eye button to hide or show an icon. Visibility, order and colors are saved separately.</p>
       <div class="fno-columns">
         <section class="fno-column" aria-labelledby="fno-left-title">
           <h2 id="fno-left-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Left toolbar</h2>
