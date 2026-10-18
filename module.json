@@ -1,8 +1,8 @@
 {
   "id": "foundry-nav-order",
-  "title": "AFT Navbar Customizer",
+  "title": "AFT Navbar+",
   "description": "Reorder, recolor and optionally hide left scene controls, tools and right sidebar tabs on a per-user basis.",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "compatibility": {
     "minimum": "14"
   },
@@ -19,7 +19,7 @@
   ],
   "url": "https://github.com/rebsiot/navbar-customizer",
   "manifest": "https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json",
-  "download": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.5/foundry-nav-order-0.1.5.zip",
+  "download": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.6/foundry-nav-order-0.1.6.zip",
   "readme": "README.md",
   "changelog": "CHANGELOG.md"
 }
