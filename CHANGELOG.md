@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 — 2026-10-18 (beta naming update)
+
+- Renamed the visible Foundry module title to **AFT Navbar Customizer** so it appears with the other AFT tools in Manage Modules.
+- Preserved the original module ID `foundry-nav-order` and existing per-user settings; no duplicate module, migration or functional changes.
+- Updated documentation and version-pinned GitHub release assets. The GitHub repository remains `rebsiot/navbar-customizer` to preserve URLs.
+- Automated tests and package verification are required for publication; live Foundry v14 behavior is not yet confirmed.
+
 ## 0.1.1 — 2026-10-18 (beta naming update)
 
 - Changed the visible module name from **Foundry Navigation Organizer** to **Navbar Customizer**, consistent with the GitHub repository.

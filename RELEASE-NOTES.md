@@ -1,27 +1,28 @@
-# Navbar Customizer v0.1.1 (Beta)
+# AFT Navbar Customizer v0.1.2 (Beta)
 
-**Easier to find in Foundry's Manage Modules window.** The displayed name now matches the GitHub repository: **Navbar Customizer**. Previously it appeared as **Foundry Navigation Organizer**.
+This update changes the name shown in Foundry's **Manage Modules** list to **AFT Navbar Customizer**. It is a naming-only update; the icon ordering features work the same as the previous beta.
 
 ## What's changed
 
-- Updated the visible module title and documentation. No gameplay behavior changed.
-- Retained the existing internal module ID, `foundry-nav-order`, and user-scoped layout preferences, so this upgrades the same module rather than installing a duplicate.
-- Clarified how to identify enabled and disabled modules using Foundry's native **Manage Modules** checkboxes. This organizer itself does not enable or disable modules.
+- The module now appears as **AFT Navbar Customizer** instead of Navbar Customizer.
+- The GitHub release and installation instructions use the same title.
+- The internal ID remains `foundry-nav-order`, so upgrading does not install a second module or erase any per-user layout settings.
+- No changes to Actors, Scenes, Journals, macros, or the macro hotbar.
 
 ## Install / upgrade
 
-Use this version-pinned test manifest in Foundry **Setup > Add-on Modules > Install Module**:
+In Foundry **Setup > Add-on Modules > Install Module**, paste the pinned beta manifest:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.1/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.2/module.json`
 
-Alternatively, download `foundry-nav-order-0.1.1.zip` and install it in `Data/modules/foundry-nav-order/` (the `module.json` must be at the folder root). Back up the existing module folder and stop Foundry before a manual replacement; then restart and refresh. Do not change the installed folder name.
+Or download `foundry-nav-order-0.1.2.zip` from this release and install it in `Data/modules/foundry-nav-order/`. Back up the existing folder and stop Foundry before manual replacement, then restart Foundry and refresh browser clients. Do not rename the installed folder.
 
-**Previous v0.1.0 installs:** Their pinned manifest may not discover this update automatically. If necessary, upgrade manually, retaining the original folder and its backup.
+**Existing v0.1.0/v0.1.1 installations:** Older version-pinned manifests may not discover the upgrade automatically. If needed, install the updated manifest or replace the existing module folder with the complete v0.1.2 ZIP, preserving the original folder path.
 
-In a running world, open **Game Settings > Manage Modules**, find **Navbar Customizer**, and confirm its checkbox is checked. Other modules' checked/unchecked states are also visible there.
+Inside a running world, a GM can check **Game Settings > Manage Modules**. A checked **AFT Navbar Customizer** entry means it is enabled in that world. Other installed modules' checked/unchecked states are displayed independently.
 
-## Testing and limitations
+## Verification and limitations
 
-The unchanged code has automated tests, and the release workflow validates the module and ZIP. The right-sidebar behavior and actual live Foundry v14 GM/player interaction have not been confirmed; this remains a beta. No Actor, Scene, Journal, hotbar or macro data migration is performed.
+The project release workflow runs syntax checks, automated mock tests, and ZIP-integrity checks. Real Foundry v14 GM/player testing of the icon-ordering controls remains pending, particularly right sidebar re-renders and third-party tabs. This release does not alter module activation state.
 
-Source and support: https://github.com/rebsiot/navbar-customizer
+Source: https://github.com/rebsiot/navbar-customizer

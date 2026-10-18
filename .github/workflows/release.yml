@@ -29,7 +29,7 @@ jobs:
           TAG="v${VERSION}"
           NAME="foundry-nav-order-${VERSION}.zip"
           node -e 'const m=require("./module.json"); const base="https://github.com/rebsiot/navbar-customizer/releases/download/v"+m.version+"/"; if(m.id!=="foundry-nav-order" || m.manifest!==base+"module.json" || m.download!==base+"foundry-nav-order-"+m.version+".zip") process.exit(1)'
-          node -e 'const m=require("./module.json"); if(m.title!=="Navbar Customizer") process.exit(1)'
+          node -e 'const m=require("./module.json"); if(m.title!=="AFT Navbar Customizer") process.exit(1)'
           mkdir -p dist
           zip -q -r "dist/${NAME}" module.json scripts styles README.md CHANGELOG.md
           unzip -tq "dist/${NAME}"
@@ -51,5 +51,5 @@ jobs:
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title "Navbar Customizer ${RELEASE_TAG} (Beta)" \
+            --title "AFT Navbar Customizer ${RELEASE_TAG} (Beta)" \
             --notes-file RELEASE-NOTES.md
