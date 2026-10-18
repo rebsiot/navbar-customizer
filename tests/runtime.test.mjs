@@ -72,7 +72,7 @@ globalThis.game={
   i18n:{localize:key=>key}, user:{isGM:true},
   settings:{
     register:(ns,key,meta)=> {registration.setting={ns,key,meta};},
-    registerMenu:(ns,key,meta)=> {registration.menu={ns,key,meta};},
+    registerMenu:(ns,key,meta)=> {if (key==='arrangeIcons') registration.menu={ns,key,meta};},
     get:()=>structuredClone(currentValue),
     set:async (_ns,_key,value)=> {
       if(saveFails) throw new Error('remote setting failed');
@@ -97,7 +97,7 @@ await test('module registers user scoped preference and menu available to player
   assert.equal(registration.setting.meta.scope,'user');
   assert.equal(registration.setting.meta.config,false);
   assert.equal(registration.menu.meta.restricted,false);
-  assert.equal(registration.menu.meta.label,'Arrange Icons');
+  assert.equal(registration.menu.meta.label,'Arrange Icon Order');
   await controls.render();
   onceHandlers.get('ready')();
   await new Promise(setImmediate);

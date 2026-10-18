@@ -27,7 +27,7 @@
 .fno-app .fno-defaults { color: var(--color-text-primary, inherit); }
 @media (max-width: 660px) { .fno-app .fno-columns { grid-template-columns: 1fr; } .fno-app .fno-help { min-height: 0; } }
 
-/* The appearance form is part of the organizer dialog. Game UI theme rules are
+/* The appearance form is part of the Change Colors dialog. Game UI theme rules are
    generated separately and only when a user has enabled a custom color. */
 .fno-app .fno-appearance { border-top: 1px solid var(--color-border-light, #777); margin-top: 18px; padding-top: 14px; }
 .fno-app .fno-appearance-help { margin: 4px 0 11px; opacity: 0.83; line-height: 1.4; }
@@ -53,3 +53,6 @@
 .fno-app .fno-visibility-summary p { margin: 0 0 8px; opacity: 0.85; line-height: 1.35; }
 .fno-app .fno-visibility-summary .fno-permission-hint { font-size: 12px; margin-top: 8px; }
 .fno-app .fno-show-all { display: inline-flex; align-items: center; gap: 6px; width: auto; padding: 6px 12px; }
+
+/* Color-only window has no sortable list above its appearance controls. */
+.fno-colors-app .fno-appearance { border-top: none; margin-top: 0; padding-top: 0; }

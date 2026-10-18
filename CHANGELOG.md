@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.7 - 2026-10-18 (beta settings split)
+
+- Split the former combined organizer into **two independent settings entries** under AFT Navbar+: **Arrange Icon Order** (drag/drop, arrows, Hide/Show and visibility reset) and **Change Colors** (left/right color picks and native color reset).
+- Renamed the settings menus and both window titles consistently to AFT Navbar+; each window now displays only controls relevant to its purpose.
+- Kept existing world and user settings keys, saved values, module ID, permissions, GitHub repository and permanent update manifest. No migration, duplicate module or world-document changes.
+- Preserved release gating, ZIP verification, automated regression tests and previous release notes. Live Foundry v14 integration still needs a smoke test.
+
 ## 0.1.6 — 2026-10-18 (beta naming update)
 
 - Renamed the Foundry module's visible title to **AFT Navbar+**. The same name now appears in the Arrange Icons settings entry, configuration window, release title and notifications.

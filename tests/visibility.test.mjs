@@ -227,7 +227,7 @@ await test('organizer presents Hide/Show alongside arrows only when permitted', 
   assert.match(panel.innerHTML,/data-visibility="hide"/);
   assert.match(panel.innerHTML,/fa-eye-slash/);
   assert.match(panel.innerHTML,/Restore All Hidden Icons/);
-  assert.match(panel.innerHTML,/Restore Default Colors/);
+  assert.doesNotMatch(panel.innerHTML,/Restore Default Colors/);
   game.user={role:1,isGM:false};
   stored.set(key('minimumHideRole'),4);
   panel=await app._renderHTML({},{});

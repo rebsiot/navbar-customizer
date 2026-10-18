@@ -1,4 +1,4 @@
-import { NavOrganizerApp } from "./organizer.mjs";
+import { NavOrganizerApp, NavColorsApp } from "./organizer.mjs";
 import {
   VISIBILITY_KEY, HIDE_MIN_ROLE_KEY, DEFAULT_MIN_ROLE, EMPTY_VISIBILITY,
   initializeVisibilityFromSettings, visibilitySettingsChanged, hideRoleSettingChanged
@@ -25,7 +25,7 @@ Hooks.once("init", () => {
 
   game.settings.register(MODULE_ID, VISIBILITY_KEY, {
     name: "Hidden Navigation Icons",
-    hint: "Your hidden icon preferences. Hidden icons can be restored through Arrange Icons.",
+    hint: "Your hidden icon preferences. Hidden icons can be restored through Arrange Icon Order.",
     scope: "user",
     config: false,
     type: Object,
@@ -59,11 +59,20 @@ Hooks.once("init", () => {
   });
 
   game.settings.registerMenu(MODULE_ID, "arrangeIcons", {
-    name: "AFT Navbar+ — Arrange Icons, Visibility and Colors",
-    label: "Arrange Icons",
-    hint: "Change icon order, optional visibility (if permitted by GM) and custom colors for your own interface.",
+    name: "AFT Navbar+ — Arrange Icon Order",
+    label: "Arrange Icon Order",
+    hint: "Reorder icons and optionally hide or show them (if permitted by GM). Colors are configured in Change Colors.",
     icon: "fa-solid fa-grip-vertical",
     type: NavOrganizerApp,
+    restricted: false
+  });
+
+  game.settings.registerMenu(MODULE_ID, "changeColors", {
+    name: "AFT Navbar+ — Change Colors",
+    label: "Change Colors",
+    hint: "Customize left toolbar and right sidebar tab colors for your user. Ordering stays unchanged.",
+    icon: "fa-solid fa-palette",
+    type: NavColorsApp,
     restricted: false
   });
 });
@@ -76,5 +85,5 @@ Hooks.once("ready", () => {
   initializeAppearanceFromSettings();
   initializeVisibilityFromSettings(applyLayoutToUI);
   attachSidebarEvents();
-  console.info(`${MODULE_ID} | v0.1.6 loaded. Open Configure Settings > Module Settings > Arrange Icons.`);
+  console.info(`${MODULE_ID} | v0.1.7 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
 });

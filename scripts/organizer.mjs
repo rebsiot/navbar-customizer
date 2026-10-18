@@ -78,8 +78,8 @@ export class NavOrganizerApp extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "foundry-nav-order-arranger",
     classes: ["fno-app"],
-    window: { title: "AFT Navbar+ — Arrange Icons & Colors", resizable: true, minimizable: false },
-    position: { width: 830, height: 730 }
+    window: { title: "AFT Navbar+ — Arrange Icon Order", resizable: true, minimizable: false },
+    position: { width: 830, height: 650 }
   };
 
   constructor(options = {}) {
@@ -92,7 +92,6 @@ export class NavOrganizerApp extends ApplicationV2 {
 
   async _renderHTML(_context, _options) {
     const layout = getLayout();
-    const appearance = getAppearance();
     const hidden = getVisibility();
     const canHide = canUserHide();
     const controls = getLeftControls();
@@ -102,7 +101,7 @@ export class NavOrganizerApp extends ApplicationV2 {
     const container = document.createElement("div");
     container.className = "fno-panel";
     container.innerHTML = `
-      <p class="fno-intro">Drag rows or use the arrows to reorder. Changes are saved automatically for your user in this world. If your GM permits, use the eye button to hide or show an icon. Visibility, order and colors are saved separately.</p>
+      <p class="fno-intro">Drag rows or use the arrows to reorder. Changes are saved automatically for your user in this world. If your GM permits, use the eye button to hide or show an icon. Colors are managed separately in Change Colors.</p>
       <div class="fno-columns">
         <section class="fno-column" aria-labelledby="fno-left-title">
           <h2 id="fno-left-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Left toolbar</h2>
@@ -125,15 +124,6 @@ export class NavOrganizerApp extends ApplicationV2 {
         <p>${canHide ? "Use the eye controls to hide or restore icons. The Settings tab stays visible." : "Hiding icons is restricted by your GM. You can still arrange icons and choose colors."}</p>
         ${canHide ? '<button type="button" class="fno-show-all" data-fno-action="show-all"><i class="fa-solid fa-eye" aria-hidden="true"></i> Restore All Hidden Icons</button>' : ""}
         ${game.user?.isGM ? '<p class="fno-permission-hint">GM: Set player access under Configure Settings → Module Settings → Who Can Hide Icons.</p>' : ""}
-      </section>
-      <section class="fno-appearance" aria-labelledby="fno-appearance-title">
-        <h2 id="fno-appearance-title"><i class="fa-solid fa-palette" aria-hidden="true"></i> Appearance</h2>
-        <p class="fno-appearance-help">Optional colors for each navigation bar. Unchecked options use your Foundry theme. Colors apply immediately.</p>
-        <div class="fno-color-columns">
-          <fieldset class="fno-color-panel"><legend>Left toolbar</legend>${appearanceFieldsHtml("left", appearance)}</fieldset>
-          <fieldset class="fno-color-panel"><legend>Right sidebar tabs</legend>${appearanceFieldsHtml("right", appearance)}</fieldset>
-        </div>
-        <button type="button" class="fno-restore-colors" data-fno-action="restore-colors"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restore Default Colors</button>
       </section>
       <footer class="fno-footer">
         <span class="fno-status" role="status" aria-live="polite">Ready</span>
@@ -434,5 +424,41 @@ export class NavOrganizerApp extends ApplicationV2 {
   #setStatus(root, status) {
     const el = root.querySelector(".fno-status");
     if (el?.isConnected) el.textContent = status;
+  }
+}
+
+
+/** Separate color preferences view. It reuses the existing appearance saving and
+ * restore handlers without exposing ordering or visibility controls. */
+export class NavColorsApp extends NavOrganizerApp {
+  static DEFAULT_OPTIONS = {
+    id: "foundry-nav-order-colors",
+    classes: ["fno-app", "fno-colors-app"],
+    window: { title: "AFT Navbar+ — Change Colors", resizable: true, minimizable: false },
+    position: { width: 620, height: 440 }
+  };
+
+  async _renderHTML(_context, _options) {
+    const appearance = getAppearance();
+    const container = document.createElement("div");
+    container.className = "fno-panel fno-colors-panel";
+    container.innerHTML = `
+      <p class="fno-intro">Choose colors separately for each navigation bar. Changes save automatically for your user. Icon order and Hide/Show are managed under Arrange Icon Order.</p>
+      <section class="fno-appearance" aria-labelledby="fno-appearance-title">
+        <h2 id="fno-appearance-title"><i class="fa-solid fa-palette" aria-hidden="true"></i> Appearance</h2>
+        <p class="fno-appearance-help">Optional colors for each navigation bar. Unchecked options use your Foundry theme. Colors apply immediately.</p>
+        <div class="fno-color-columns">
+          <fieldset class="fno-color-panel"><legend>Left toolbar</legend>${appearanceFieldsHtml("left", appearance)}</fieldset>
+          <fieldset class="fno-color-panel"><legend>Right sidebar tabs</legend>${appearanceFieldsHtml("right", appearance)}</fieldset>
+        </div>
+        <button type="button" class="fno-restore-colors" data-fno-action="restore-colors"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restore Default Colors</button>
+      </section>
+      <footer class="fno-footer">
+        <span class="fno-status" role="status" aria-live="polite">Ready</span>
+        <div class="fno-buttons">
+          <button type="button" data-fno-action="close"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</button>
+        </div>
+      </footer>`;
+    return container;
   }
 }

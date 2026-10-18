@@ -53,7 +53,7 @@ globalThis.game = {
 const appearance = await import("../scripts/appearance.mjs");
 const {EMPTY_LAYOUT} = await import("../scripts/layout.mjs");
 const {MODULE_ID,SETTING_KEY,saveLayout,initializeLayoutFromSettings,getLayout} = await import("../scripts/runtime.mjs");
-const {NavOrganizerApp} = await import("../scripts/organizer.mjs");
+const {NavColorsApp} = await import("../scripts/organizer.mjs");
 const APPEARANCE_KEY = `${MODULE_ID}.${appearance.APPEARANCE_SETTING_KEY}`;
 const LAYOUT_KEY = `${MODULE_ID}.${SETTING_KEY}`;
 
@@ -109,7 +109,8 @@ test("separate user scoped settings are registered and layout shape stays intact
   assert.equal(registry.get(APPEARANCE_KEY).config,false);
   assert.equal(registry.get(LAYOUT_KEY).scope,"user");
   assert.equal(registry.get(LAYOUT_KEY).config,false);
-  assert.equal(registry.get(`${MODULE_ID}.arrangeIcons`).label,"Arrange Icons");
+  assert.equal(registry.get(`${MODULE_ID}.arrangeIcons`).label,"Arrange Icon Order");
+  assert.equal(registry.get(`${MODULE_ID}.changeColors`).label,"Change Colors");
   appearance.initializeAppearanceFromSettings();
   initializeLayoutFromSettings();
   assert.equal(styleElements.size,0);
@@ -178,12 +179,12 @@ test("multiple rapid color changes persist in order", async() => {
 });
 
 test("appearance panel displays independent left/right custom controls", async() => {
-  const app=new NavOrganizerApp();
+  const app=new NavColorsApp();
   const panel=await app._renderHTML({},{});
   assert.match(panel.innerHTML,/fno-appearance-title/);
   assert.match(panel.innerHTML,/Restore Default Colors/);
-  assert.match(panel.innerHTML,/Reset Icon Order/);
-  assert.match(panel.innerHTML,/data-fno-action="defaults"/);
+  assert.doesNotMatch(panel.innerHTML,/Reset Icon Order/);
+  assert.doesNotMatch(panel.innerHTML,/data-fno-action="defaults"/);
   for(const side of ["left","right"]) for(const field of ["background","icons","active"]) {
     assert.ok(panel.innerHTML.includes(`class="fno-theme-toggle" data-side="${side}" data-field="${field}"`));
     assert.ok(panel.innerHTML.includes(`class="fno-theme-picker" data-side="${side}" data-field="${field}"`));
@@ -192,7 +193,7 @@ test("appearance panel displays independent left/right custom controls", async()
 
 test("appearance panel accurately checks enabled fields after saved color", async() => {
   await appearance.saveAppearance({left:{background:"#101010"},right:{icons:"#ffffff"}});
-  const app=new NavOrganizerApp();
+  const app=new NavColorsApp();
   const html=(await app._renderHTML({},{})).innerHTML;
   assert.match(html,/data-side="left" data-field="background" checked/);
   assert.match(html,/data-side="right" data-field="icons" checked/);
