@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 — 2026-10-18 (beta naming update)
+
+- Renamed the Foundry module's visible title to **AFT Navbar+**. The same name now appears in the Arrange Icons settings entry, configuration window, release title and notifications.
+- Retained the module ID `foundry-nav-order`, installation folder, GitHub repository and **permanent update manifest**. This updates the existing installation without duplicating the module or migrating any data.
+- No changes to icon ordering, Hide/Show permissions, per-user color preferences, user settings, macros or world documents.
+- Existing v0.1.5 users can use Foundry's normal **Update** function. Earlier pinned-manifest versions still require their one-time transition to the permanent manifest.
+- Automated checks cover branding, release metadata, existing functionality and ZIP integrity; real Foundry v14 client behavior still requires a live test.
+
 ## 0.1.5 — 2026-10-18 (beta update-channel repair)
 
 - Introduced one permanent update manifest: `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`.

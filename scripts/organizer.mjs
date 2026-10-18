@@ -78,7 +78,7 @@ export class NavOrganizerApp extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "foundry-nav-order-arranger",
     classes: ["fno-app"],
-    window: { title: "Arrange Icons & Colors", resizable: true, minimizable: false },
+    window: { title: "AFT Navbar+ — Arrange Icons & Colors", resizable: true, minimizable: false },
     position: { width: 830, height: 730 }
   };
 
@@ -318,7 +318,7 @@ export class NavOrganizerApp extends ApplicationV2 {
       if (ticket === this.statusTicket) {
         this.#refreshHiddenRows(root);
         this.#setStatus(root, "Could not save icon visibility");
-        ui.notifications.error("AFT Navbar Customizer could not save your hidden icons.");
+        ui.notifications.error("AFT Navbar+ could not save your hidden icons.");
       }
     } finally { button.disabled = false; }
   }
@@ -337,7 +337,7 @@ export class NavOrganizerApp extends ApplicationV2 {
       console.error("foundry-nav-order | Could not restore hidden icons", error);
       if (ticket === this.statusTicket) {
         this.#setStatus(root, "Could not restore hidden icons");
-        ui.notifications.error("AFT Navbar Customizer could not restore hidden icons.");
+        ui.notifications.error("AFT Navbar+ could not restore hidden icons.");
       }
     }
   }
@@ -365,7 +365,7 @@ export class NavOrganizerApp extends ApplicationV2 {
     } catch (error) {
       console.error("foundry-nav-order | Could not save user icon order", error);
       if (ticket === this.statusTicket) this.#setStatus(root, "Could not save. Reopen to retry.");
-      ui.notifications.error("Navigation Organizer could not save your layout. Check permissions or connection.");
+      ui.notifications.error("AFT Navbar+ could not save your layout. Check permissions or connection.");
     }
   }
 
@@ -380,7 +380,7 @@ export class NavOrganizerApp extends ApplicationV2 {
     } catch (error) {
       console.error("foundry-nav-order | Could not reset layout", error);
       this.#setStatus(root, "Reset failed. Please retry.");
-      ui.notifications.error("Navigation Organizer could not reset your layout.");
+      ui.notifications.error("AFT Navbar+ could not reset your layout.");
     }
   }
 
@@ -409,7 +409,7 @@ export class NavOrganizerApp extends ApplicationV2 {
       if (ticket !== this.statusTicket) return;
       this.#restoreAppearanceInputs(root);
       this.#setStatus(root, "Color save failed. Try again.");
-      ui.notifications.error("AFT Navbar Customizer could not save your colors.");
+      ui.notifications.error("AFT Navbar+ could not save your colors.");
     }
   }
 
@@ -427,7 +427,7 @@ export class NavOrganizerApp extends ApplicationV2 {
       if (ticket !== this.statusTicket) return;
       this.#restoreAppearanceInputs(root);
       this.#setStatus(root, "Could not restore colors. Try again.");
-      ui.notifications.error("AFT Navbar Customizer could not restore default colors.");
+      ui.notifications.error("AFT Navbar+ could not restore default colors.");
     }
   }
 

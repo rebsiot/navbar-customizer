@@ -59,7 +59,7 @@ Hooks.once("init", () => {
   });
 
   game.settings.registerMenu(MODULE_ID, "arrangeIcons", {
-    name: "Arrange Icons, Visibility and Colors",
+    name: "AFT Navbar+ — Arrange Icons, Visibility and Colors",
     label: "Arrange Icons",
     hint: "Change icon order, optional visibility (if permitted by GM) and custom colors for your own interface.",
     icon: "fa-solid fa-grip-vertical",
@@ -76,5 +76,5 @@ Hooks.once("ready", () => {
   initializeAppearanceFromSettings();
   initializeVisibilityFromSettings(applyLayoutToUI);
   attachSidebarEvents();
-  console.info(`${MODULE_ID} | v0.1.4 loaded. Open Configure Settings > Module Settings > Arrange Icons.`);
+  console.info(`${MODULE_ID} | v0.1.6 loaded. Open Configure Settings > Module Settings > Arrange Icons.`);
 });

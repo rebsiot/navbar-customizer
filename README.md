@@ -1,8 +1,9 @@
-# AFT Navbar Customizer
+# AFT Navbar+
 
 Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolbar and right sidebar. Hidden icons can always be restored. Changes affect only your own interface; nothing moves between sides.
 
-**Version:** 0.1.5 beta — October 18, 2026  
+**Version:** 0.1.6 beta — October 18, 2026  
+**Previously named:** AFT Navbar Customizer; the module ID and your saved settings are unchanged.  
 **Requirements:** Foundry VTT v14; system-independent  
 **Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
 
@@ -28,13 +29,15 @@ Use this **permanent Foundry manifest URL**. It will not change for future relea
 
 In **Foundry Setup > Add-on Modules > Install Module**, paste that link and install. The Foundry **Update** or **Update All** action will then check it for new versions. Foundry does not install updates unattended.
 
+**Already on v0.1.5:** Use Setup > Add-on Modules > Update. The permanent manifest is unchanged and should offer v0.1.6. This update renames only the displayed module and settings; it does not create a second module.
+
 **Upgrading from v0.1.0–v0.1.4:** Those installs include a manifest pinned to an old GitHub release, so their Update button cannot discover this version. Make a backup and **do one manual transition**:
 
 1. Stop Foundry and back up your existing `Data/modules/foundry-nav-order/` folder.
-2. Download the [complete v0.1.5 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.5/foundry-nav-order-0.1.5.zip) and extract its contents into that same folder (do not create an additional directory).
-3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar Customizer v0.1.5**. After that, Update will follow the permanent manifest link.
+2. Download the [complete v0.1.6 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.6/foundry-nav-order-0.1.6.zip) and extract its contents into that same folder (do not create an additional directory).
+3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar+ v0.1.6**. After that, Update will follow the permanent manifest link.
 
-Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar Customizer; it should find v0.1.5 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
+Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar+; it should find v0.1.6 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
 
 For the St. Louis Samba installation, the folder is `Z:\Data\modules\foundry-nav-order`. Only module code is replaced; existing world data and per-user settings are not migrated. Avoid uninstalling/reinstalling unless otherwise necessary.
 
@@ -42,7 +45,7 @@ For the St. Louis Samba installation, the folder is `Z:\Data\modules\foundry-nav
 
 ## Use
 
-1. Enable **AFT Navbar Customizer** in your test world under **Game Settings > Manage Modules** (as GM).
+1. Enable **AFT Navbar+** in your test world under **Game Settings > Manage Modules** (as GM).
 2. Open a Scene, then choose **Game Settings > Configure Settings > Module Settings > Arrange Icons**.
 3. Drag icon rows or use up/down arrows. When permitted, press the **eye icon** beside a row to **Hide** it; press the eye again to **Show** it. Hidden rows remain listed, marked “Hidden.”
 4. In **Appearance**, tick any desired custom color and choose a color swatch. The **Left toolbar** and **Right sidebar tabs** have separate controls.

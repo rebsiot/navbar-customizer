@@ -1,21 +1,25 @@
-# AFT Navbar Customizer v0.1.5 — Permanent update URL
+# AFT Navbar+ v0.1.6 (Beta) — Name update
 
-You no longer need a new manifest URL for every release. This update fixes the module's update configuration so Foundry can discover future releases when you use **Update** or **Update All**.
+The module is now called **AFT Navbar+** in Foundry's module list and settings. The configuration window, messages, and GitHub release use the same name.
 
-## Permanent installation and update manifest
+## What's changed
+
+- Renamed the visible module title and settings entry from **AFT Navbar Customizer** to **AFT Navbar+**.
+- Kept the existing module ID `foundry-nav-order`, installation folder, GitHub URL and permanent manifest. This is an update to the same module, not a second installation.
+- Icon order, Hide/Show, player/Trusted Player permissions, colors and user preferences are unchanged. No Actor, Scene, Journal, macro or hotbar data is migrated.
+
+## Install / upgrade
+
+If you already have **v0.1.5**, use **Foundry Setup > Add-on Modules > Update**. The permanent manifest automatically offers this release once the verified ZIP is published.
+
+For a new installation, use the *same permanent manifest*:
 
 `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`
 
-This URL remains the same across future module versions. Only successfully built and published releases are promoted to it. Foundry checks on demand; this does not silently install updates.
+If your installed version is **v0.1.0–v0.1.4**, it may still use a version-pinned manifest. Back up `Data/modules/foundry-nav-order`, stop Foundry and install the complete v0.1.6 ZIP into the existing folder, or back up and update only the installed manifest URL to the permanent URL, then restart and run Update. Do not rename the module directory or uninstall it. Hard-refresh browser clients after updating.
 
-## Upgrading an existing installation
+## Compatibility and verification
 
-Previously installed versions (including v0.1.3 and v0.1.4) used version-pinned manifests and will **not** discover this release automatically. **Back up** your `Data/modules/foundry-nav-order` folder before changing code. Stop Foundry and extract the [v0.1.5 full ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.5/foundry-nav-order-0.1.5.zip) directly over that same module folder (with `module.json` at the folder root); restart and reload clients. The new install can check for later releases using the normal Update command.
+Foundry v14 target, system-independent. Automated tests, archive validation and release-channel promotion are checked by GitHub Actions. The live Foundry GM/Trusted Player/Player interface remains unverified. Disable the module and reload to restore native UI, or restore the backed-up previous module folder for code rollback.
 
-If you can edit the currently installed `module.json`, there is also a smaller one-time option: back it up, replace only its `manifest` field with the permanent URL above, restart Foundry, and select **Update** in Foundry Setup. The updater can then retrieve v0.1.5 itself.
-
-## Scope and status
-
-This is a packaging/update-path repair. There are **no changes** to hiding/showing icons, player permissions, ordering, color settings, module ID `foundry-nav-order`, or stored Foundry/world data. Roll back with the saved v0.1.4 module folder/complete ZIP if needed. Functionality remains beta: Foundry v14 GM/player live tests are still pending.
-
-Release source, support and notes: https://github.com/rebsiot/navbar-customizer
+Source: https://github.com/rebsiot/navbar-customizer

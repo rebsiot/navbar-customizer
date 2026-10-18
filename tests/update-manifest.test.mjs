@@ -9,7 +9,7 @@ const stable = 'https://raw.githubusercontent.com/rebsiot/navbar-customizer/upda
 
 test('stable manifest URL is independent of the release version', () => {
   assert.equal(manifest.id, 'foundry-nav-order');
-  assert.equal(manifest.title, 'AFT Navbar Customizer');
+  assert.equal(manifest.title, 'AFT Navbar+');
   assert.equal(manifest.manifest, stable);
   assert.equal(pkg.version, manifest.version);
 });
