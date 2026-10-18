@@ -1,25 +1,26 @@
-# AFT Navbar+ v0.1.7 (Beta) - Separate settings screens
+# AFT Navbar+ v0.1.8 (Beta) — Missing module toolbar tools
 
-The module now has **two settings entries** inside Foundry's **AFT Navbar+** section. Ordering and colors no longer share the same window.
+The **Arrange Icon Order** window can now find tools added by other modules to the selected toolbar category. Previously it could show only the core tools because AFT Navbar+ captured the toolbar list before other modules had finished adding their controls.
 
-## What's new
+## What's fixed
 
-- **Arrange Icon Order** - drag-and-drop and arrow reordering for left toolbar categories, their tools, and right sidebar tabs. The Hide/Show eye buttons and Restore All Hidden Icons remain here for players permitted by the GM.
-- **Change Colors** - a separate compact window for independently customizing backgrounds, icons and active highlights on each navigation bar; Restore Default Colors is here only.
-- Both configuration windows are titled **AFT Navbar+** and have independent Done buttons. Settings names use the same branding.
+- The category and subtool lists use Foundry v14's prepared scene controls, including tools/categories added by later native hook subscribers.
+- Saved ordering and per-user Hide/Show preferences are re-applied to late-added tools after render, with a guarded one-time refresh. Native buttons and their actions remain unchanged.
+- Hidden tools remain available in the organizer for restoring. Foundry/user-inaccessible controls remain excluded.
+- Separate **Arrange Icon Order** and **Change Colors** settings, your saved colors, GM hide permissions and existing module ID are unchanged.
 
-## Install / upgrade
+## Install / update
 
-In Foundry Setup > Add-on Modules, choose **Update** for AFT Navbar+ if you already installed v0.1.5 or later through its permanent manifest:
+Use Foundry Setup → Add-on Modules → Update if already on v0.1.5 or newer. The existing permanent manifest automatically offers this version:
 
 `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`
 
-Older v0.1.0-v0.1.4 installations have version-pinned manifests. Back up the existing `Data/modules/foundry-nav-order` folder, stop Foundry and replace its contents with the full v0.1.7 ZIP; alternatively update only the stored manifest URL after a backup and restart, then use Update. Refresh browser clients. Do not change the module ID or installed folder name.
+For a manual update, download the complete `foundry-nav-order-0.1.8.zip`, back up `Data/modules/foundry-nav-order`, stop Foundry, replace its contents, restart, and refresh the client. Do not create a differently named module folder. See README for upgrades from earlier pinned-manifest versions.
 
-## Preserved data and limitations
+## Known limitations / verification
 
-This is a UI organization update. The stored `layout`, `appearance`, `visibility` and `minimumHideRole` settings, GM permission choices, per-user color preferences, Actors, Scenes, Journals, macros and hotbar slots are untouched. Each reset action still affects only its own settings.
+Automated syntax and mock tests cover multiple third-party native `getSceneControlButtons` additions, hide/order persistence, permission filtering and avoiding redraw loops. No actual Foundry v14 GM/player test has yet run. Modules that inject toolbar buttons directly into DOM outside Foundry's native control registry may still be absent from the organizer; third-party themes can also affect layout.
 
-This beta passed automated tests and package validation. Two independent settings menu buttons and their exact placement still require confirmation in a real Foundry v14 GM and player session. Roll back by disabling the module or restoring the complete previous v0.1.6 folder from a backup.
+Rollback: restore the previous complete module folder or v0.1.7 ZIP. Preferences remain stored under the same user/world setting keys; no world-document migration occurs.
 
 Source and issues: https://github.com/rebsiot/navbar-customizer

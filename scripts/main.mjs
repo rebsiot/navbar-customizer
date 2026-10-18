@@ -9,7 +9,7 @@ import {
 } from "./appearance.mjs";
 import {
   MODULE_ID, SETTING_KEY, initializeLayoutFromSettings,
-  settingsChanged, updateSceneControls, sidebarRendered, attachSidebarEvents, applyLayoutToUI
+  settingsChanged, updateSceneControls, sidebarRendered, attachSidebarEvents, attachSceneControlEvents, applyLayoutToUI
 } from "./runtime.mjs";
 
 Hooks.once("init", () => {
@@ -81,9 +81,10 @@ Hooks.on("getSceneControlButtons", updateSceneControls);
 Hooks.on("renderSidebar", sidebarRendered);
 
 Hooks.once("ready", () => {
+  attachSceneControlEvents();
   initializeLayoutFromSettings();
   initializeAppearanceFromSettings();
   initializeVisibilityFromSettings(applyLayoutToUI);
   attachSidebarEvents();
-  console.info(`${MODULE_ID} | v0.1.7 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
+  console.info(`${MODULE_ID} | v0.1.8 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
 });

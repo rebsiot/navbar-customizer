@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.8 — 2026-10-18 (beta)
+
+- Fixed the **Tools within a category** list missing additional tools registered after AFT Navbar+'s `getSceneControlButtons` hook. The organizer now reads the fully prepared native v14 controls, with the live hook record as an early fallback.
+- Added guarded post-render reconciliation to apply existing per-user order and Hide/Show preferences to late-registered native tools and categories without replacing native callbacks or rebuilding world data.
+- Preserve previously hidden items in the organizer for restoration, but do not expose controls that native Foundry or another module marked unavailable for this user.
+- Added regression tests using 9 module-added tools, an additional category, late hook registrations, restricted controls and a one-time non-reset refresh.
+- Kept `foundry-nav-order` module ID, permanent update manifest, AFT Navbar+ display title, separate ordering/color windows, settings keys and GM hide permission unchanged.
+- Automated/mock-tested; real Foundry v14 module combinations remain live-unverified.
+
 ## 0.1.7 - 2026-10-18 (beta settings split)
 
 - Split the former combined organizer into **two independent settings entries** under AFT Navbar+: **Arrange Icon Order** (drag/drop, arrows, Hide/Show and visibility reset) and **Change Colors** (left/right color picks and native color reset).

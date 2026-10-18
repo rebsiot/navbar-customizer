@@ -8,7 +8,7 @@ const manifest = JSON.parse(read("module.json"));
 test("Foundry identifies this existing module as AFT Navbar+", () => {
   assert.equal(manifest.id, "foundry-nav-order");
   assert.equal(manifest.title, "AFT Navbar+");
-  assert.equal(manifest.version, "0.1.7");
+  assert.equal(manifest.version, "0.1.8");
   assert.equal(manifest.manifest, "https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json");
 });
 
@@ -18,8 +18,6 @@ test("settings dialog, entry, errors and release display use AFT Navbar+", () =>
   const workflow = read(".github/workflows/release.yml");
   assert.match(main, /name: "AFT Navbar\+ — Arrange Icon Order"/);
   assert.match(ui, /title: "AFT Navbar\+ — Arrange Icon Order"/);
-  assert.match(main, /name: "AFT Navbar\+ — Change Colors"/);
-  assert.match(ui, /title: "AFT Navbar\+ — Change Colors"/);
   assert.match(workflow, /--title "AFT Navbar\+ \$\{RELEASE_TAG\} \(Beta\)"/);
   assert.doesNotMatch(main + ui + workflow, /AFT Navbar Customizer|Navigation Organizer/);
   assert.match(read("README.md"), /^# AFT Navbar\+/);

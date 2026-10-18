@@ -1,5 +1,5 @@
 import { EMPTY_LAYOUT, normalizeLayout, sortedEntries, applySceneOrders, orderedIds, reorderTabElements } from "./layout.mjs";
-import { applySceneVisibility, applySidebarVisibility, canUserHide, getVisibility } from "./visibility.mjs";
+import { applySceneVisibility, applySidebarVisibility, canUserHide, getVisibility, isHidden } from "./visibility.mjs";
 
 export const MODULE_ID = "foundry-nav-order";
 export const SETTING_KEY = "layout";
@@ -10,6 +10,8 @@ let writeQueue = Promise.resolve();
 let pendingWrites = 0;
 let initialized = false;
 let observedControls = null;
+let lastHookControls = null;
+let sceneRefreshPending = false;
 const sidebarBaselines = new WeakMap();
 
 const TAB_NAMES = {
@@ -95,14 +97,84 @@ export function getRightTabs() {
   });
 }
 
+/** The last hook snapshot may be incomplete: other modules can register more
+ * SceneControlTool entries later during getSceneControlButtons. Foundry v14's
+ * ui.controls.controls exposes the fully prepared record after those callbacks.
+ * Keep the hook record as a fallback before the first render. */
+function currentControlRecord() {
+  let live;
+  try { live = ui.controls?.controls; }
+  catch (_error) { /* Controls not prepared yet. */ }
+  if (live && typeof live === "object" && Object.keys(live).length) return live;
+  return lastHookControls ?? observedControls ?? {};
+}
+
+/** Record newly registered entries before AFT applies any visibility changes.
+ * Original availability is kept separately so GM-only entries aren't exposed
+ * just because they share an id with a saved hidden preference. */
+function rememberNewControls(controls) {
+  if (!controls || typeof controls !== "object") return;
+  if (!observedControls) observedControls = {};
+  for (const [id, control] of Object.entries(controls)) {
+    if (!control || typeof control !== "object") continue;
+    if (!Object.hasOwn(observedControls, id)) {
+      observedControls[id] = {
+        ...control,
+        tools: Object.fromEntries(Object.entries(control.tools ?? {})
+          .filter(([, tool]) => tool && typeof tool === "object")
+          .map(([key, tool]) => [key, { ...tool }]))
+      };
+      continue;
+    }
+    const knownTools = observedControls[id].tools ??= {};
+    for (const [key, tool] of Object.entries(control.tools ?? {})) {
+      if (tool && typeof tool === "object" && !Object.hasOwn(knownTools, key)) {
+        knownTools[key] = { ...tool };
+      }
+    }
+  }
+}
+
+/** A hidden entry remains in the settings list only if it was originally
+ * available to this user. These are UI preferences, never permission grants. */
+function showableEntries(record, area, controlId = null) {
+  const hidden = getVisibility();
+  const allowed = canUserHide();
+  const originals = area === "tools" ? observedControls?.[controlId]?.tools : observedControls;
+  return sortedEntries(record, { visibleOnly: false }).filter(({ id }) => {
+    const candidate = record[id];
+    if (candidate?.visible !== false) return true;
+    const original = originals?.[id];
+    return allowed && original && original.visible !== false &&
+      isHidden(hidden, area, id, controlId);
+  });
+}
+
+/** Some builds may omit hidden buttons from the prepared record. Keep only
+ * known, user-hidden originals as a fallback, not arbitrary disabled tools. */
+function includeOwnHidden(record, originals, area, controlId = null) {
+  const result = { ...(record ?? {}) };
+  if (!canUserHide() || !originals) return result;
+  const hidden = getVisibility();
+  for (const [id, original] of Object.entries(originals)) {
+    if (!Object.hasOwn(result, id) && original?.visible !== false &&
+      isHidden(hidden, area, id, controlId)) result[id] = original;
+  }
+  return result;
+}
+
 export function getLeftControls() {
-  const source = observedControls ?? ui.controls?.controls ?? {};
-  return sortedEntries(source);
+  const live = currentControlRecord();
+  const source = includeOwnHidden(live, observedControls, "left");
+  return showableEntries(source, "left");
 }
 
 export function getToolsFor(controlId) {
-  const source = observedControls ?? ui.controls?.controls ?? {};
-  return sortedEntries(source[controlId]?.tools);
+  const live = currentControlRecord();
+  const nativeTools = live[controlId]?.tools ?? observedControls?.[controlId]?.tools;
+  const originals = observedControls?.[controlId]?.tools;
+  const source = includeOwnHidden(nativeTools, originals, "tools", controlId);
+  return showableEntries(source, "tools", controlId);
 }
 
 function applyRightOrder() {
@@ -178,13 +250,66 @@ export function settingsChanged(value) {
 }
 
 export function updateSceneControls(controls) {
-  // Snapshot before our mutations: keep the real control/tool labels and defaults.
-  observedControls = Object.fromEntries(Object.entries(controls ?? {}).map(([id, control]) => [id, {
-    ...control,
-    tools: control?.tools ? Object.fromEntries(Object.entries(control.tools).map(([key, value]) => [key, { ...value }])) : {}
-  }]));
+  // Keep both the unmodified early baseline (for restoring our hidden entries)
+  // and the live hook record (which later hook subscribers can extend).
+  lastHookControls = controls;
+  observedControls = {};
+  rememberNewControls(controls);
   applySceneOrders(controls, currentLayout);
   applySceneVisibility(controls, getVisibility(), canUserHide());
+}
+
+/** Reconcile a *completed* v14 control record with our per-user settings.
+ * This catches modules which add controls after our getSceneControlButtons
+ * callback. Existing action callbacks are never changed or replaced. */
+export function reconcilePreparedControls(controls = currentControlRecord()) {
+  if (!controls || typeof controls !== "object") return false;
+  rememberNewControls(controls);
+  const previous = new Map();
+  for (const [id, control] of Object.entries(controls)) {
+    if (!control || typeof control !== "object") continue;
+    previous.set(`control:${id}`, { order: control.order, visible: control.visible });
+    for (const [toolId, tool] of Object.entries(control.tools ?? {})) {
+      if (tool && typeof tool === "object") {
+        previous.set(`tool:${id}:${toolId}`, { order: tool.order, visible: tool.visible });
+      }
+    }
+  }
+  applySceneOrders(controls, currentLayout);
+  applySceneVisibility(controls, getVisibility(), canUserHide());
+  for (const [id, control] of Object.entries(controls)) {
+    if (!control || typeof control !== "object") continue;
+    const before = previous.get(`control:${id}`);
+    if (before && (before.order !== control.order || before.visible !== control.visible)) return true;
+    for (const [toolId, tool] of Object.entries(control.tools ?? {})) {
+      if (!tool || typeof tool !== "object") continue;
+      const oldTool = previous.get(`tool:${id}:${toolId}`);
+      if (oldTool && (oldTool.order !== tool.order || oldTool.visible !== tool.visible)) return true;
+    }
+  }
+  return false;
+}
+
+/** Re-render prepared controls *without* resetting the native control record.
+ * This preserves additions from hooks that ran after ours. Guard the second
+ * render to avoid a recursive render loop. */
+export function attachSceneControlEvents() {
+  const controls = ui.controls;
+  if (!controls?.addEventListener) return;
+  controls.addEventListener("render", () => {
+    if (sceneRefreshPending) return;
+    queueMicrotask(() => {
+      if (sceneRefreshPending || controls !== ui.controls) return;
+      try {
+        if (!reconcilePreparedControls(controls.controls)) return;
+      } catch (error) { warn("Could not reconcile added scene tools", error); return; }
+      if (!controls.render) return;
+      sceneRefreshPending = true;
+      Promise.resolve().then(() => controls.render({ reset: false }))
+        .catch(error => warn("Could not refresh additional scene tools", error))
+        .finally(() => { sceneRefreshPending = false; });
+    });
+  });
 }
 
 export function attachSidebarEvents() {
