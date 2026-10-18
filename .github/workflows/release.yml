@@ -1,4 +1,4 @@
-name: Build and publish tagged beta
+name: Validate release and promote stable update manifest
 
 on:
   push:
@@ -17,10 +17,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
       - name: Verify module syntax and tests
         run: |
           npm run check
           npm test
+
       - name: Assemble and verify version-matched package
         shell: bash
         run: |
@@ -28,23 +30,25 @@ jobs:
           VERSION="$(node -p 'require("./module.json").version')"
           TAG="v${VERSION}"
           NAME="foundry-nav-order-${VERSION}.zip"
-          node -e 'const m=require("./module.json"); const base="https://github.com/rebsiot/navbar-customizer/releases/download/v"+m.version+"/"; if(m.id!=="foundry-nav-order" || m.manifest!==base+"module.json" || m.download!==base+"foundry-nav-order-"+m.version+".zip") process.exit(1)'
-          node -e 'const m=require("./module.json"); if(m.title!=="AFT Navbar Customizer") process.exit(1)'
+          node -e 'const m=require("./module.json"); const d="https://github.com/rebsiot/navbar-customizer/releases/download/v"+m.version+"/foundry-nav-order-"+m.version+".zip"; const s="https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json"; if(m.id!=="foundry-nav-order" || m.title!=="AFT Navbar Customizer" || m.manifest!==s || m.download!==d) process.exit(1)'
           mkdir -p dist
           zip -q -r "dist/${NAME}" module.json scripts styles README.md CHANGELOG.md
           unzip -tq "dist/${NAME}"
           test "$(unzip -Z1 "dist/${NAME}" | grep -cx 'module.json')" -eq 1
           cp module.json dist/module.json
           echo "RELEASE_TAG=${TAG}" >> "$GITHUB_ENV"
+          echo "RELEASE_VERSION=${VERSION}" >> "$GITHUB_ENV"
           echo "RELEASE_ZIP=dist/${NAME}" >> "$GITHUB_ENV"
-      - name: Publish prerelease with pinned manifest and ZIP
+          echo "RELEASE_NAME=${NAME}" >> "$GITHUB_ENV"
+
+      - name: Publish versioned beta ZIP and manifest
         env:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release ${RELEASE_TAG} already exists. Refusing to replace its artifacts."
+            echo "Release ${RELEASE_TAG} already exists; refusing to overwrite its artifacts."
             exit 1
           fi
           gh release create "$RELEASE_TAG" "$RELEASE_ZIP" dist/module.json \
@@ -53,3 +57,38 @@ jobs:
             --prerelease \
             --title "AFT Navbar Customizer ${RELEASE_TAG} (Beta)" \
             --notes-file RELEASE-NOTES.md
+
+      - name: Promote permanent update channel only after release is verified
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_API="repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}"
+          TAG_TARGET="$(gh api "$RELEASE_API" --jq '.target_commitish')"
+          test "$TAG_TARGET" = "$GITHUB_SHA"
+          ASSETS="$(gh api "$RELEASE_API" --jq '.assets[].name')"
+          printf '%s\n' "$ASSETS" | grep -Fxq "$RELEASE_NAME"
+          printf '%s\n' "$ASSETS" | grep -Fxq 'module.json'
+          ZIP_SIZE="$(gh api "$RELEASE_API" --jq '.assets[] | select(.name | endswith(".zip")) | .size')"
+          MANIFEST_SIZE="$(gh api "$RELEASE_API" --jq '.assets[] | select(.name == "module.json") | .size')"
+          test "$ZIP_SIZE" -gt 0 && test "$MANIFEST_SIZE" -gt 0
+
+          # This branch is the public update channel. It is promoted only after
+          # a completed release with both artifacts; unreleased main commits
+          # and failed builds cannot advertise a nonexistent ZIP.
+          CHANNEL_FILE="repos/${GITHUB_REPOSITORY}/contents/module.json"
+          OLD_SHA="$(gh api "${CHANNEL_FILE}?ref=update-channel" --jq '.sha')"
+          ENCODED="$(base64 --wrap=0 module.json)"
+          gh api -X PUT "$CHANNEL_FILE" \
+            -f branch='update-channel' \
+            -f sha="$OLD_SHA" \
+            -f content="$ENCODED" \
+            -f message="Promote stable Foundry manifest to ${RELEASE_TAG}" >/dev/null
+
+          gh api "${CHANNEL_FILE}?ref=update-channel" --jq '.content' | base64 --decode | \
+            jq -e --arg version "$RELEASE_VERSION" \
+              --arg download "https://github.com/${GITHUB_REPOSITORY}/releases/download/${RELEASE_TAG}/${RELEASE_NAME}" \
+              --arg manifest 'https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json' \
+              '.version == $version and .download == $download and .manifest == $manifest' >/dev/null
+          echo "Promoted ${RELEASE_TAG} to the permanent update manifest."

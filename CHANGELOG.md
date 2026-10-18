@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.5 — 2026-10-18 (beta update-channel repair)
+
+- Introduced one permanent update manifest: `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`.
+- Fixed the previously version-pinned manifest field so Foundry can detect future module releases with Update/Update All.
+- Introduced an `update-channel` branch that is promoted by GitHub Actions **only after** tests, ZIP validation, and creation of both public release assets succeed.
+- Preserved the `foundry-nav-order` module ID, hide/show, GM role controls, icon ordering, color choices, and all existing user/world settings. No migration.
+- Added upgrade and rollback instructions for older pinned installations. A one-time update is required for those installations to join the stable update channel.
+- Functional Foundry UI behavior remains beta pending actual GM/player testing; this patch changes distribution/update metadata only.
+
+
 ## 0.1.4 — 2026-10-18 (beta)
 
 - Added **Hide/Show** (eye icon) beside the up/down arrows for left toolbar categories, left subtools and right sidebar tabs. Hidden icons stay in the organizer, and **Restore All Hidden Icons** restores them without changing colors or order.

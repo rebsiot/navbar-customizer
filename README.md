@@ -2,7 +2,7 @@
 
 Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolbar and right sidebar. Hidden icons can always be restored. Changes affect only your own interface; nothing moves between sides.
 
-**Version:** 0.1.4 beta — October 18, 2026  
+**Version:** 0.1.5 beta — October 18, 2026  
 **Requirements:** Foundry VTT v14; system-independent  
 **Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
 
@@ -20,15 +20,25 @@ Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolba
 
 All color checkboxes are **off by default**, and unchecked properties use the ordinary Foundry theme. Color changes affect only the left scene controls and right sidebar tab navigation, **not** sidebar contents, other game windows or the macro hotbar. If chosen colors make icons hard to distinguish, uncheck them or use **Restore Default Colors**.
 
-## Installation — v0.1.4 beta
+## Install and keep updating
 
-In **Foundry Setup > Add-on Modules > Install Module**, paste this version-pinned manifest:
+Use this **permanent Foundry manifest URL**. It will not change for future releases:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.4/module.json`
+`https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`
 
-Or download the ZIP from the [v0.1.4 beta release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.4) and extract it directly to `Data/modules/foundry-nav-order/`, with `module.json` at that directory's root.
+In **Foundry Setup > Add-on Modules > Install Module**, paste that link and install. The Foundry **Update** or **Update All** action will then check it for new versions. Foundry does not install updates unattended.
 
-**Upgrading:** Back up the existing module folder; stop Foundry before manual replacement; restart Foundry and refresh the client. The module ID remains `foundry-nav-order`. This is **not** a new/additional module. Existing v0.1.0–v0.1.3 icon order and color preferences are retained. Earlier manifests use version-pinned URLs and may not discover upgrades automatically. In the St. Louis installation, the Samba path is `Z:\Data\modules\foundry-nav-order`.
+**Upgrading from v0.1.0–v0.1.4:** Those installs include a manifest pinned to an old GitHub release, so their Update button cannot discover this version. Make a backup and **do one manual transition**:
+
+1. Stop Foundry and back up your existing `Data/modules/foundry-nav-order/` folder.
+2. Download the [complete v0.1.5 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.5/foundry-nav-order-0.1.5.zip) and extract its contents into that same folder (do not create an additional directory).
+3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar Customizer v0.1.5**. After that, Update will follow the permanent manifest link.
+
+Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar Customizer; it should find v0.1.5 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
+
+For the St. Louis Samba installation, the folder is `Z:\Data\modules\foundry-nav-order`. Only module code is replaced; existing world data and per-user settings are not migrated. Avoid uninstalling/reinstalling unless otherwise necessary.
+
+**How the permanent URL works:** GitHub publishes the numbered release ZIP and validates the release assets first; only then does the automated workflow update the `update-channel` manifest to point to it. Failed builds and unreleased work on `main` are not advertised as installable updates. Individual release archives stay version-pinned for rollback.
 
 ## Use
 
@@ -62,7 +72,7 @@ This module does **not** modify game documents, Actors, Scenes, Journals, macros
 
 ## Rollback
 
-Disable the module and reload the client to return to Foundry's ordinary icon order, visibility and colors. A manual rollback to [v0.1.3](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.3) is possible using the backed-up module folder or earlier complete ZIP. v0.1.3 ignores the new visibility setting; if returning to v0.1.4 later, previously hidden icons may reappear as hidden. Use **Restore All Hidden Icons** before downgrading if you want to clear those preferences. Existing colors/order are preserved. Code rollback does not require a world-data restoration because no world documents are migrated.
+Disable the module and reload the client to return to Foundry's ordinary icon order, visibility and colors. A manual rollback to [v0.1.4](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.4) is possible using the backed-up module folder or earlier complete ZIP. A code rollback to v0.1.4 retains the existing visibility feature and user preferences. Disable the module and reload for immediate UI rollback; do not remove saved settings unless you intentionally reset them. Existing colors/order are preserved. Code rollback does not require a world-data restoration because no world documents are migrated.
 
 ## Source, support and license
 
@@ -71,4 +81,4 @@ Disable the module and reload the client to return to Foundry's ordinary icon or
 - [Release history](CHANGELOG.md)
 - Automated local checks: `npm run check` and `npm test` with Node 22+.
 
-No public software redistribution license has been selected. The repository and release do not include licensed creator art, credentials, world data, or player-private information. This GitHub beta is not an official Foundry package listing.
+No public software redistribution license has been selected. The repository and release do not include licensed creator art, credentials, world data, or player-private information. This GitHub beta is not an official Foundry package listing. Future releases are available with Foundry’s normal Update command via the permanent manifest.
