@@ -1,8 +1,8 @@
-# Foundry Navigation Organizer
+# Navbar Customizer
 
 Reorder the icons in Foundry VTT's left scene toolbar and right sidebar. Keep each side separate. No cross-side movement, hidden controls, or hotbar changes.
 
-**Version:** 0.1.0 beta (2026-10-17)  
+**Version:** 0.1.1 beta (2026-10-18)  
 **Compatibility target:** Foundry VTT v14; any game system.  
 **Status:** Automated tests passed. Not yet tested in a live Foundry v14 world.
 
@@ -15,23 +15,29 @@ Reorder the icons in Foundry VTT's left scene toolbar and right sidebar. Keep ea
 - Automatically save a layout for **each user in each world**, across browser sessions.
 - **Reset to Defaults** without touching Actors, Scenes, macros, or document data.
 
-## Install the v0.1.0 beta
+## Install the v0.1.1 beta
 
 This prerelease is for testing in Foundry v14, not a verified live release.
 
 **Foundry installer:** In **Setup > Add-on Modules > Install Module**, paste this version-pinned manifest URL:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.0/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.1/module.json`
 
-**Manual installation:** Download `foundry-nav-order-0.1.0.zip` from [the v0.1.0 release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.0), then:
+**Manual installation:** Download `foundry-nav-order-0.1.1.zip` from [the v0.1.1 release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.1), then:
 
 1. Back up `Data/modules/foundry-nav-order`, if it exists. Use a test world.
 2. Stop Foundry before replacing existing module files.
 3. Extract the ZIP contents directly into `Data/modules/foundry-nav-order/`, with `module.json` at the root.
-4. Restart Foundry, enable **Foundry Navigation Organizer** in the world and refresh your browser.
+4. Restart Foundry, enable **Navbar Customizer** in the world and refresh your browser.
 5. Open **Game Settings > Configure Settings > Module Settings > Arrange Icons**.
 
 For the private St. Louis Samba deployment, modules are under `Z:\Data\modules`.
+
+## Verify enablement in Foundry
+
+In an active world, open **Game Settings > Manage Modules** as GM and search for **Navbar Customizer**. The checked box means it is enabled **for that world**; unchecked means installed but disabled. You can also see the activation state of the other installed modules in that window. This module does not change module enablement, and GitHub cannot read your live world's active module list.
+
+**Upgrading from v0.1.0:** Both versions use the *same* module ID (`foundry-nav-order`). There is no second module to enable and no data migration. The v0.1.0 beta used a version-pinned manifest that may not discover later versions automatically. If it does not offer the update, back up the existing `Data/modules/foundry-nav-order` folder, stop Foundry, replace its contents with the v0.1.1 release ZIP, then restart and refresh the client. Do **not** rename the installed folder or delete character/world data.
 
 ## First use
 
