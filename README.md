@@ -1,8 +1,8 @@
 # AFT Navbar Customizer
 
-Arrange the left scene-control icons and right sidebar tabs in Foundry VTT. Optionally choose different background, icon and selected-icon highlight colors for each side. No icons can move from one side to the other.
+Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolbar and right sidebar. Hidden icons can always be restored. Changes affect only your own interface; nothing moves between sides.
 
-**Version:** 0.1.3 beta — October 18, 2026  
+**Version:** 0.1.4 beta — October 18, 2026  
 **Requirements:** Foundry VTT v14; system-independent  
 **Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
 
@@ -12,40 +12,57 @@ Arrange the left scene-control icons and right sidebar tabs in Foundry VTT. Opti
 - Reorder tools inside an individual left toolbar category.
 - Reorder right sidebar tabs (Chat, Combat, Actors, Scenes and module-added tabs).
 - Independently choose a **background**, **icon** and **active-icon highlight** color for the left toolbar or right sidebar *tab bar*.
-- Keep a separate arrangement and color selection for each user in each world. Changes save automatically.
-- Restore **Default Colors** without changing saved icon order, or **Reset Icon Order** without changing colors.
+- Hide or show individual left categories, left subtools or right sidebar tab icons using an eye button next to the up/down arrows. Hidden entries remain in the organizer.
+- GMs can allow hiding for **GMs only** (default), **Trusted Players and above**, or **All Players** through a world setting.
+- Keep separate ordering, visibility and colors for each user in each world. Changes save automatically.
+- **Restore All Hidden Icons** without resetting icon order or colors. The Settings tab is never hideable, keeping this action reachable.
+- Restore **Default Colors** without changing visibility or saved icon order, or **Reset Icon Order** without changing hiding or colors.
 
 All color checkboxes are **off by default**, and unchecked properties use the ordinary Foundry theme. Color changes affect only the left scene controls and right sidebar tab navigation, **not** sidebar contents, other game windows or the macro hotbar. If chosen colors make icons hard to distinguish, uncheck them or use **Restore Default Colors**.
 
-## Installation — v0.1.3 beta
+## Installation — v0.1.4 beta
 
 In **Foundry Setup > Add-on Modules > Install Module**, paste this version-pinned manifest:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.4/module.json`
 
-Or download the ZIP from the [v0.1.3 beta release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.3) and extract it directly to `Data/modules/foundry-nav-order/`, with `module.json` at that directory's root.
+Or download the ZIP from the [v0.1.4 beta release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.4) and extract it directly to `Data/modules/foundry-nav-order/`, with `module.json` at that directory's root.
 
-**Upgrading:** Back up the existing module folder; stop Foundry before manual replacement; restart Foundry and refresh the client. The module ID remains `foundry-nav-order`. This is **not** a new/additional module. Existing v0.1.0–v0.1.2 icon order preferences are retained. Earlier manifests use version-pinned URLs and may not discover upgrades automatically. In the St. Louis installation, the Samba path is `Z:\Data\modules\foundry-nav-order`.
+**Upgrading:** Back up the existing module folder; stop Foundry before manual replacement; restart Foundry and refresh the client. The module ID remains `foundry-nav-order`. This is **not** a new/additional module. Existing v0.1.0–v0.1.3 icon order and color preferences are retained. Earlier manifests use version-pinned URLs and may not discover upgrades automatically. In the St. Louis installation, the Samba path is `Z:\Data\modules\foundry-nav-order`.
 
 ## Use
 
 1. Enable **AFT Navbar Customizer** in your test world under **Game Settings > Manage Modules** (as GM).
 2. Open a Scene, then choose **Game Settings > Configure Settings > Module Settings > Arrange Icons**.
-3. Drag icon rows or use up/down arrows. Changing a category's tools or the right tabs is independent of the other lists.
+3. Drag icon rows or use up/down arrows. When permitted, press the **eye icon** beside a row to **Hide** it; press the eye again to **Show** it. Hidden rows remain listed, marked “Hidden.”
 4. In **Appearance**, tick any desired custom color and choose a color swatch. The **Left toolbar** and **Right sidebar tabs** have separate controls.
-5. Use **Restore Default Colors** to turn off all custom colors. **Reset Icon Order** only resets the order. Click **Done** when finished.
+5. Use **Restore All Hidden Icons** to show everything you hid, **Restore Default Colors** to remove custom colors, or **Reset Icon Order** for the icon order. These operations are independent. Click **Done** when finished.
 
 Changes save for your user in the current world; another player may select a different layout and colors. Colors are displayed immediately without manually refreshing. The right sidebar's contents remain in Foundry's existing colors.
 
+## GM permission for hiding icons
+
+In a running world, a GM opens **Game Settings > Configure Settings > Module Settings** and changes **Who Can Hide Icons**:
+
+| Choice | May hide/show |
+|---|---|
+| **GM only** (default) | Game Masters |
+| **Trusted Players and above** | Trusted Players, Assistant GMs and GMs |
+| **All Players and above** | Players, Trusted Players, Assistant GMs and GMs |
+
+This controls only **Hide/Show** and **Restore All Hidden Icons**. Ordering and colors remain available to every user. When access is revoked, any previously hidden icons are shown again; the user's hidden preferences remain saved and become effective if access is granted again. Each user hides only their own icons. This is a **visual preference**, not a security boundary or Foundry permission replacement; hiding a tab does not prevent opening the underlying document by another supported path.
+
+**Safety:** The **Settings** sidebar tab cannot be hidden. When hiding the currently active sidebar tab, the module tries to activate Settings first. If it cannot switch safely, it keeps the active icon visible instead. A tab that is hidden in your interface remains registered in Foundry.
+
 ## Compatibility and beta limitations
 
-The left toolbar uses native v14 scene-control ordering fields. Sidebar tabs use their existing DOM nodes (no replacement of native actions). Styling targets Foundry's v14 `#scene-controls` and sidebar tab navigation structure. UI replacement modules may change those elements, so third-party themes can conflict. The **right-sidebar tab bar**, dynamic third-party tabs, highlighted controls and GM/player color persistence still need real v14 checks.
+The left toolbar uses native v14 scene-control ordering and visibility fields. Sidebar tabs use their existing DOM nodes (no replacement of native actions). Styling targets Foundry's v14 `#scene-controls` and sidebar tab navigation structure. UI replacement modules may change those elements, so third-party themes can conflict. The **right-sidebar tab bar**, dynamic third-party tabs, hidden active tools, permission changes, highlighted controls and GM/player color persistence still need real v14 checks.
 
-This module does **not** modify game documents, Actors, Scenes, Journals, macros, hotbar placements, or module activation state. It stores separate user-scoped `layout` (existing) and `appearance` (new) settings. Colors use strict six-digit hex validation, and no custom CSS code can be entered.
+This module does **not** modify game documents, Actors, Scenes, Journals, macros, hotbar placements, or module activation state. It stores separate user-scoped `layout`, `appearance`, and `visibility` settings, plus one GM-controlled world setting for hiding access. Colors use strict six-digit hex validation, and no custom CSS code can be entered.
 
 ## Rollback
 
-Disable the module and reload the client to return to Foundry's ordinary icon order and colors. A manual rollback to [v0.1.2](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.2) is possible using the backed-up module folder or earlier complete ZIP. v0.1.2 ignores the new appearance setting; if returning to v0.1.3 later, the saved color choices may reappear. Use **Restore Default Colors** before downgrading if you want to clear them. Code rollback does not require a world-data restoration because no world documents are migrated.
+Disable the module and reload the client to return to Foundry's ordinary icon order, visibility and colors. A manual rollback to [v0.1.3](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.3) is possible using the backed-up module folder or earlier complete ZIP. v0.1.3 ignores the new visibility setting; if returning to v0.1.4 later, previously hidden icons may reappear as hidden. Use **Restore All Hidden Icons** before downgrading if you want to clear those preferences. Existing colors/order are preserved. Code rollback does not require a world-data restoration because no world documents are migrated.
 
 ## Source, support and license
 

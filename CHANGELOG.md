@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.4 — 2026-10-18 (beta)
+
+- Added **Hide/Show** (eye icon) beside the up/down arrows for left toolbar categories, left subtools and right sidebar tabs. Hidden icons stay in the organizer, and **Restore All Hidden Icons** restores them without changing colors or order.
+- Added a **GM-controlled minimum role** setting with GM only (default), Trusted Players and above, or All Players. Each user's visibility preference is independent; removing access temporarily reveals their icons without discarding preferences.
+- Protects the Settings sidebar tab from being hidden, and attempts to switch active hidden tabs to Settings. If switching fails, the active tab remains visible.
+- Uses Foundry v14 native `visible` fields for left controls/tools and non-destructive DOM visibility for right tabs. Does not uninstall modules, edit world documents or change Foundry permission grants.
+- Preserves `foundry-nav-order`, existing `layout` and `appearance` settings, and all previous functionality. No data migration.
+- Automated/mock tests; real Foundry v14 client behavior and third-party UI compatibility remain unverified.
+
+
 ## 0.1.3 — 2026-10-18 (beta)
 
 - Added a compact **Appearance** section beneath icon ordering: separate left-toolbar and right-sidebar tab-bar background, icon, and selected-icon highlight colors.

@@ -41,3 +41,15 @@
 .fno-app .fno-theme-picker:disabled { opacity: 0.4; cursor: default; }
 .fno-app .fno-restore-colors { display: inline-flex; align-items: center; gap: 7px; width: auto; max-width: 100%; margin: 10px 0 0; padding: 6px 12px; }
 @media (max-width: 660px) { .fno-app .fno-color-columns { grid-template-columns: 1fr; } }
+
+/* Optional per-user hide/show controls. Hidden items stay discoverable here. */
+.fno-app .fno-row-hidden { opacity: 0.7; border-style: dashed; }
+.fno-app .fno-row-hidden .fno-name { font-style: italic; }
+.fno-app .fno-hidden-status { font-size: 11px; color: var(--color-text-secondary, #888); font-style: normal; }
+.fno-app .fno-hidden-status[hidden] { display: none; }
+.fno-app .fno-hide-button { min-width: 29px; }
+.fno-app .fno-locked { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 27px; opacity: 0.5; }
+.fno-app .fno-visibility-summary { padding: 12px 0; border-top: 1px solid var(--color-border-light, #777); margin-top: 16px; }
+.fno-app .fno-visibility-summary p { margin: 0 0 8px; opacity: 0.85; line-height: 1.35; }
+.fno-app .fno-visibility-summary .fno-permission-hint { font-size: 12px; margin-top: 8px; }
+.fno-app .fno-show-all { display: inline-flex; align-items: center; gap: 6px; width: auto; padding: 6px 12px; }

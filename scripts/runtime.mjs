@@ -1,4 +1,5 @@
 import { EMPTY_LAYOUT, normalizeLayout, sortedEntries, applySceneOrders, orderedIds, reorderTabElements } from "./layout.mjs";
+import { applySceneVisibility, applySidebarVisibility, canUserHide, getVisibility } from "./visibility.mjs";
 
 export const MODULE_ID = "foundry-nav-order";
 export const SETTING_KEY = "layout";
@@ -113,7 +114,9 @@ function applyRightOrder() {
   // A blank user preference means Foundry's original order for this exact DOM.
   const saved = currentLayout.right.length ? currentLayout.right : native;
   const desired = orderedIds(saved, native.concat(entries.map(entry => entry.id)));
-  return reorderTabElements(container, entries, desired);
+  const reordered = reorderTabElements(container, entries, desired);
+  applySidebarVisibility(entries, getVisibility(), canUserHide());
+  return reordered;
 }
 
 export function applyLayoutToUI({ left = true, right = true } = {}) {
@@ -181,6 +184,7 @@ export function updateSceneControls(controls) {
     tools: control?.tools ? Object.fromEntries(Object.entries(control.tools).map(([key, value]) => [key, { ...value }])) : {}
   }]));
   applySceneOrders(controls, currentLayout);
+  applySceneVisibility(controls, getVisibility(), canUserHide());
 }
 
 export function attachSidebarEvents() {

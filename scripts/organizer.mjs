@@ -1,6 +1,10 @@
 import { escapeHtml, orderedIds, safeIconClasses } from "./layout.mjs";
 import { getAppearance, saveAppearance, resetAppearance } from "./appearance.mjs";
 import {
+  canUserHide, getVisibility, isHidden, toggleHidden,
+  saveVisibility, resetVisibility
+} from "./visibility.mjs";
+import {
   getLayout, getLeftControls, getRightTabs, getToolsFor,
   localizedLabel, saveLayout, resetLayout
 } from "./runtime.mjs";
@@ -34,19 +38,28 @@ function orderedRows(entries, saved) {
   return orderedIds(saved, entries.map(entry => entry.id)).map(id => lookup.get(id)).filter(Boolean);
 }
 
-function rowsHtml(entries, saved) {
+function rowsHtml(entries, saved, area, hidden, allowHide, controlId = null) {
   const items = orderedRows(entries, saved);
   if (!items.length) return '<li class="fno-empty">No available controls in this area.</li>';
   return items.map(entry => {
     const text = localizedLabel(entry.title, entry.id);
     const icon = safeIconClasses(entry.icon || "fa-solid fa-cube");
-    return `<li class="fno-row" draggable="true" data-id="${escapeHtml(entry.id)}">
+    const concealed = allowHide && isHidden(hidden, area, entry.id, controlId);
+    const protectedTab = area === "right" && entry.id === "settings";
+    const action = concealed ? "show" : "hide";
+    const actionText = concealed ? "Show" : "Hide";
+    const toggleButton = allowHide && !protectedTab ?
+      `<button type="button" class="fno-hide-button" data-visibility="${action}"
+         aria-label="${actionText} ${escapeHtml(text)}" title="${actionText} icon"><i class="fa-solid ${concealed ? "fa-eye" : "fa-eye-slash"}" aria-hidden="true"></i></button>` :
+      (allowHide && protectedTab ? '<span class="fno-locked" title="Settings stays visible" aria-label="Settings stays visible"><i class="fa-solid fa-lock" aria-hidden="true"></i></span>' : "");
+    return `<li class="fno-row ${concealed ? "fno-row-hidden" : ""}" draggable="true" data-id="${escapeHtml(entry.id)}">
       <span class="fno-grip" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>
       <i class="fno-icon ${escapeHtml(icon)}" aria-hidden="true"></i>
-      <span class="fno-name" title="${escapeHtml(text)}">${escapeHtml(text)}</span>
+      <span class="fno-name" title="${escapeHtml(text)}">${escapeHtml(text)}<span class="fno-hidden-status" ${concealed ? "" : "hidden"}> (Hidden)</span></span>
       <span class="fno-moves">
         <button type="button" data-move="up" aria-label="Move ${escapeHtml(text)} up" title="Move up"><i class="fa-solid fa-chevron-up"></i></button>
         <button type="button" data-move="down" aria-label="Move ${escapeHtml(text)} down" title="Move down"><i class="fa-solid fa-chevron-down"></i></button>
+        ${toggleButton}
       </span>
     </li>`;
   }).join("");
@@ -80,6 +93,8 @@ export class NavOrganizerApp extends ApplicationV2 {
   async _renderHTML(_context, _options) {
     const layout = getLayout();
     const appearance = getAppearance();
+    const hidden = getVisibility();
+    const canHide = canUserHide();
     const controls = getLeftControls();
     const rightTabs = getRightTabs();
     if (!controls.some(entry => entry.id === this.selectedControl)) this.selectedControl = controls[0]?.id ?? null;
@@ -87,25 +102,30 @@ export class NavOrganizerApp extends ApplicationV2 {
     const container = document.createElement("div");
     container.className = "fno-panel";
     container.innerHTML = `
-      <p class="fno-intro">Drag rows or use the arrow buttons. Changes are saved automatically for your user in this world. Choose optional colors below; icon order and colors are independent.</p>
+      <p class="fno-intro">Drag rows or use the arrows to reorder. If your GM permits, use the eye button to hide or show an icon. Visibility, order and colors are saved separately for your user.</p>
       <div class="fno-columns">
         <section class="fno-column" aria-labelledby="fno-left-title">
           <h2 id="fno-left-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Left toolbar</h2>
-          <p class="fno-help">Scene control categories, such as Tokens, Tiles and Drawings.</p>
-          <ol class="fno-list" data-area="left" aria-label="Left toolbar controls">${rowsHtml(controls, layout.left)}</ol>
+          <p class="fno-help">Scene control categories, such as Tokens, Tiles and Drawings. Hidden icons stay in this list for recovery.</p>
+          <ol class="fno-list" data-area="left" aria-label="Left toolbar controls">${rowsHtml(controls, layout.left, "left", hidden, canHide)}</ol>
           <div class="fno-subtools">
             <h3>Tools within a category</h3>
             <label for="fno-control-select">Choose category</label>
             <select id="fno-control-select" ${!controls.length ? "disabled" : ""}>${selectOptions(controls, this.selectedControl)}</select>
-            <ol class="fno-list fno-tools" data-area="tools" aria-label="Tools in selected category">${rowsHtml(tools, layout.tools[this.selectedControl] ?? [])}</ol>
+            <ol class="fno-list fno-tools" data-area="tools" aria-label="Tools in selected category">${rowsHtml(tools, layout.tools[this.selectedControl] ?? [], "tools", hidden, canHide, this.selectedControl)}</ol>
           </div>
         </section>
         <section class="fno-column" aria-labelledby="fno-right-title">
           <h2 id="fno-right-title"><i class="fa-solid fa-bars" aria-hidden="true"></i> Right sidebar</h2>
           <p class="fno-help">Chat, Combat, Actors, Scenes, Journals and module tabs.</p>
-          <ol class="fno-list" data-area="right" aria-label="Right sidebar tabs">${rowsHtml(rightTabs, layout.right)}</ol>
+          <ol class="fno-list" data-area="right" aria-label="Right sidebar tabs">${rowsHtml(rightTabs, layout.right, "right", hidden, canHide)}</ol>
         </section>
       </div>
+      <section class="fno-visibility-summary">
+        <p>${canHide ? "Use the eye controls to hide or restore icons. The Settings tab stays visible." : "Hiding icons is restricted by your GM. You can still arrange icons and choose colors."}</p>
+        ${canHide ? '<button type="button" class="fno-show-all" data-fno-action="show-all"><i class="fa-solid fa-eye" aria-hidden="true"></i> Restore All Hidden Icons</button>' : ""}
+        ${game.user?.isGM ? '<p class="fno-permission-hint">GM: Set player access under Configure Settings → Module Settings → Who Can Hide Icons.</p>' : ""}
+      </section>
       <section class="fno-appearance" aria-labelledby="fno-appearance-title">
         <h2 id="fno-appearance-title"><i class="fa-solid fa-palette" aria-hidden="true"></i> Appearance</h2>
         <p class="fno-appearance-help">Optional colors for each navigation bar. Unchecked options use your Foundry theme. Colors apply immediately.</p>
@@ -138,7 +158,7 @@ export class NavOrganizerApp extends ApplicationV2 {
       this.selectedControl = event.currentTarget.value;
       const list = root.querySelector('.fno-list[data-area="tools"]');
       const layout = getLayout();
-      list.innerHTML = rowsHtml(getToolsFor(this.selectedControl), layout.tools[this.selectedControl] ?? []);
+      list.innerHTML = rowsHtml(getToolsFor(this.selectedControl), layout.tools[this.selectedControl] ?? [], "tools", getVisibility(), canUserHide(), this.selectedControl);
       this.#updateArrows(root);
     });
 
@@ -153,8 +173,19 @@ export class NavOrganizerApp extends ApplicationV2 {
         void this.#reset(root);
         return;
       }
+      if (button.dataset.fnoAction === "show-all") {
+        void this.#restoreHidden(root);
+        return;
+      }
       if (button.dataset.fnoAction === "restore-colors") {
         void this.#resetColors(root);
+        return;
+      }
+      if (button.dataset.visibility === "hide" || button.dataset.visibility === "show") {
+        const row = button.closest("li[data-id]");
+        const list = row?.closest(".fno-list");
+        const area = list?.dataset.area;
+        if (row && area) void this.#commitVisibility(root, area, row.dataset.id, button.dataset.visibility === "hide", button);
         return;
       }
       const move = button.dataset.move;
@@ -239,6 +270,75 @@ export class NavOrganizerApp extends ApplicationV2 {
         if (up) up.disabled = i === 0;
         if (down) down.disabled = i === rows.length - 1;
       });
+    }
+  }
+
+  #refreshHiddenRows(root) {
+    const hidden = getVisibility();
+    for (const list of root.querySelectorAll(".fno-list")) {
+      const area = list.dataset.area;
+      for (const row of list.querySelectorAll("li[data-id]")) {
+        const concealed = isHidden(hidden, area, row.dataset.id, area === "tools" ? this.selectedControl : null);
+        row.classList.toggle("fno-row-hidden", concealed);
+        const status = row.querySelector(".fno-hidden-status");
+        if (status) status.hidden = !concealed;
+        const toggle = row.querySelector(".fno-hide-button");
+        if (!toggle) continue;
+        const text = row.querySelector(".fno-name")?.firstChild?.textContent?.trim() ?? row.dataset.id;
+        const verb = concealed ? "Show" : "Hide";
+        toggle.dataset.visibility = verb.toLowerCase();
+        toggle.setAttribute("aria-label", `${verb} ${text}`);
+        toggle.title = `${verb} icon`;
+        const icon = toggle.querySelector("i");
+        if (icon) {
+          icon.classList.toggle("fa-eye", concealed);
+          icon.classList.toggle("fa-eye-slash", !concealed);
+        }
+      }
+    }
+  }
+
+  async #commitVisibility(root, area, id, shouldHide, button) {
+    if (!canUserHide()) {
+      ui.notifications.warn("Your GM has not enabled hiding icons for your role.");
+      return;
+    }
+    if (area === "right" && id === "settings") return;
+    button.disabled = true;
+    this.#setStatus(root, shouldHide ? "Hiding icon…" : "Showing icon…");
+    const ticket = ++this.statusTicket;
+    try {
+      const next = toggleHidden(getVisibility(), area, id, this.selectedControl, shouldHide);
+      await saveVisibility(next);
+      if (ticket !== this.statusTicket) return;
+      this.#refreshHiddenRows(root);
+      this.#setStatus(root, shouldHide ? "Icon hidden for your user" : "Icon restored for your user");
+    } catch (error) {
+      console.error("foundry-nav-order | Could not save hidden icons", error);
+      if (ticket === this.statusTicket) {
+        this.#refreshHiddenRows(root);
+        this.#setStatus(root, "Could not save icon visibility");
+        ui.notifications.error("AFT Navbar Customizer could not save your hidden icons.");
+      }
+    } finally { button.disabled = false; }
+  }
+
+  async #restoreHidden(root) {
+    if (!canUserHide()) return;
+    this.#setStatus(root, "Restoring hidden icons…");
+    const ticket = ++this.statusTicket;
+    try {
+      await resetVisibility();
+      if (ticket !== this.statusTicket) return;
+      this.#refreshHiddenRows(root);
+      this.#setStatus(root, "All user-hidden icons restored");
+      ui.notifications.info("All your hidden icons have been restored. Order and colors were preserved.");
+    } catch (error) {
+      console.error("foundry-nav-order | Could not restore hidden icons", error);
+      if (ticket === this.statusTicket) {
+        this.#setStatus(root, "Could not restore hidden icons");
+        ui.notifications.error("AFT Navbar Customizer could not restore hidden icons.");
+      }
     }
   }
 

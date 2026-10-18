@@ -1,29 +1,33 @@
-# AFT Navbar Customizer v0.1.3 (Beta) — Optional navbar colors
+# AFT Navbar Customizer v0.1.4 (Beta) — Hide/Show Icons
 
-Choose the look of the left scene toolbar and right sidebar tabs without affecting anyone else's preferences. Existing icon ordering remains unchanged.
+You can now hide individual icons directly beside the up/down arrows in **Arrange Icons**. Hidden entries stay listed, so you can show them again at any time.
 
 ## What's new
 
-- **Appearance** section in **Arrange Icons** for the left toolbar and right sidebar tabs.
-- Separate background, icon and active-icon highlight color choices on each side.
-- All colors start disabled; no changes to Foundry's theme unless a user enables a color.
-- **Restore Default Colors** removes only color changes. **Reset Icon Order** still handles the existing layout separately.
-- Per-user preferences persist across browsers within the same world.
+- Eye button beside each permitted row to **Hide** or **Show** a left toolbar category, a tool within a category, or a right sidebar tab.
+- **Restore All Hidden Icons** brings back everything you've hidden. It does not reset your saved order or colors.
+- A GM sets **Who Can Hide Icons** in Module Settings to **GM only** (default), **Trusted Players and above**, or **All Players**. Each user hides icons only on their own interface.
+- The Settings tab always remains visible. The current active sidebar tab is switched to Settings before hiding where the native UI allows it.
+- Colors and ordering from v0.1.3 remain intact. No module IDs, Actors, Scenes, Journals, macros, or module activation settings are changed.
 
-## Install or upgrade
+## Install / upgrade
 
-Use the v0.1.3 beta manifest in **Foundry Setup > Add-on Modules > Install Module**:
+In Foundry **Setup > Add-on Modules > Install Module**, use this version-pinned beta manifest:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.4/module.json`
 
-Or install the full `foundry-nav-order-0.1.3.zip` into `Data/modules/foundry-nav-order/`. Back up the module folder and stop the server before manual replacement; then restart and reload clients. Versions 0.1.0–0.1.2 used pinned manifests and might require manual updating. **Do not rename the installed folder:** the module ID is still `foundry-nav-order`.
+Or download the full `foundry-nav-order-0.1.4.zip` and extract it into `Data/modules/foundry-nav-order/`, with `module.json` at the module root. **Back up the existing module folder and stop Foundry before manual replacement**; restart and refresh client browsers afterward. Keep the existing folder and module ID `foundry-nav-order`. Older version-pinned manifests may require manual upgrading.
 
-## Compatibility and verification
+## Where to find it
 
-Foundry v14 target, system-independent. Automated syntax, unit/mocked UI and ZIP checks passed. Real Foundry GM/player operation, sidebar UI replacement modules and third-party styling have **not** yet been verified. This is a beta, not a live-confirmed release. No Actor, Scene, Journal, macro or hotbar data is migrated.
+- **Arrange Icons**: Game Settings > Configure Settings > Module Settings > Arrange Icons.
+- **GM permission choice**: Game Settings > Configure Settings > Module Settings > **Who Can Hide Icons**.
+- Hidden rows are visibly marked; use **Show** on a row or **Restore All Hidden Icons**.
 
-## Rollback
+## Limitations and rollback
 
-Disable the module and reload for native styling and ordering, or restore the saved previous module folder/v0.1.2 complete ZIP. Color settings stored under the v0.1.3 user preference are ignored by v0.1.2, not deleted; use **Restore Default Colors** before downgrading to clear them deliberately.
+**Beta**: automated tests and release-package checks do not prove real Foundry v14 behavior. Test left categories, subtools, sidebar tabs and permissions with a GM and a player, particularly when using another UI theme. Hiding is visual only, not an access-control feature.
 
-Source and issues: https://github.com/rebsiot/navbar-customizer
+Disable the module and reload to restore Foundry's original icon order, visibility and colors, or restore the backed-up v0.1.3 module folder. v0.1.3 ignores the new hidden-preference setting; your old visibility selection will become active again on a future v0.1.4 update unless you use **Restore All Hidden Icons** first. No world-document migration is involved.
+
+Source: https://github.com/rebsiot/navbar-customizer
