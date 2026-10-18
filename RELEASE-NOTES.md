@@ -1,28 +1,29 @@
-# AFT Navbar Customizer v0.1.2 (Beta)
+# AFT Navbar Customizer v0.1.3 (Beta) — Optional navbar colors
 
-This update changes the name shown in Foundry's **Manage Modules** list to **AFT Navbar Customizer**. It is a naming-only update; the icon ordering features work the same as the previous beta.
+Choose the look of the left scene toolbar and right sidebar tabs without affecting anyone else's preferences. Existing icon ordering remains unchanged.
 
-## What's changed
+## What's new
 
-- The module now appears as **AFT Navbar Customizer** instead of Navbar Customizer.
-- The GitHub release and installation instructions use the same title.
-- The internal ID remains `foundry-nav-order`, so upgrading does not install a second module or erase any per-user layout settings.
-- No changes to Actors, Scenes, Journals, macros, or the macro hotbar.
+- **Appearance** section in **Arrange Icons** for the left toolbar and right sidebar tabs.
+- Separate background, icon and active-icon highlight color choices on each side.
+- All colors start disabled; no changes to Foundry's theme unless a user enables a color.
+- **Restore Default Colors** removes only color changes. **Reset Icon Order** still handles the existing layout separately.
+- Per-user preferences persist across browsers within the same world.
 
-## Install / upgrade
+## Install or upgrade
 
-In Foundry **Setup > Add-on Modules > Install Module**, paste the pinned beta manifest:
+Use the v0.1.3 beta manifest in **Foundry Setup > Add-on Modules > Install Module**:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.2/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/module.json`
 
-Or download `foundry-nav-order-0.1.2.zip` from this release and install it in `Data/modules/foundry-nav-order/`. Back up the existing folder and stop Foundry before manual replacement, then restart Foundry and refresh browser clients. Do not rename the installed folder.
+Or install the full `foundry-nav-order-0.1.3.zip` into `Data/modules/foundry-nav-order/`. Back up the module folder and stop the server before manual replacement; then restart and reload clients. Versions 0.1.0–0.1.2 used pinned manifests and might require manual updating. **Do not rename the installed folder:** the module ID is still `foundry-nav-order`.
 
-**Existing v0.1.0/v0.1.1 installations:** Older version-pinned manifests may not discover the upgrade automatically. If needed, install the updated manifest or replace the existing module folder with the complete v0.1.2 ZIP, preserving the original folder path.
+## Compatibility and verification
 
-Inside a running world, a GM can check **Game Settings > Manage Modules**. A checked **AFT Navbar Customizer** entry means it is enabled in that world. Other installed modules' checked/unchecked states are displayed independently.
+Foundry v14 target, system-independent. Automated syntax, unit/mocked UI and ZIP checks passed. Real Foundry GM/player operation, sidebar UI replacement modules and third-party styling have **not** yet been verified. This is a beta, not a live-confirmed release. No Actor, Scene, Journal, macro or hotbar data is migrated.
 
-## Verification and limitations
+## Rollback
 
-The project release workflow runs syntax checks, automated mock tests, and ZIP-integrity checks. Real Foundry v14 GM/player testing of the icon-ordering controls remains pending, particularly right sidebar re-renders and third-party tabs. This release does not alter module activation state.
+Disable the module and reload for native styling and ordering, or restore the saved previous module folder/v0.1.2 complete ZIP. Color settings stored under the v0.1.3 user preference are ignored by v0.1.2, not deleted; use **Restore Default Colors** before downgrading to clear them deliberately.
 
-Source: https://github.com/rebsiot/navbar-customizer
+Source and issues: https://github.com/rebsiot/navbar-customizer

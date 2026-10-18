@@ -1,8 +1,8 @@
 {
   "id": "foundry-nav-order",
   "title": "AFT Navbar Customizer",
-  "description": "Arrange left scene controls, their tools, and right sidebar tabs separately; each user saves their own layout.",
-  "version": "0.1.2",
+  "description": "Reorder Foundry scene controls and sidebar tabs and optionally customize their colors for each user.",
+  "version": "0.1.3",
   "compatibility": {
     "minimum": "14"
   },
@@ -13,13 +13,11 @@
     "styles/organizer.css"
   ],
   "authors": [
-    {
-      "name": "St. Louis v2 toolkit"
-    }
+    { "name": "St. Louis v2 toolkit" }
   ],
   "url": "https://github.com/rebsiot/navbar-customizer",
-  "manifest": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.2/module.json",
-  "download": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.2/foundry-nav-order-0.1.2.zip",
+  "manifest": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/module.json",
+  "download": "https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/foundry-nav-order-0.1.3.zip",
   "readme": "README.md",
   "changelog": "CHANGELOG.md"
 }

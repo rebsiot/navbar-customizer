@@ -1,65 +1,57 @@
 # AFT Navbar Customizer
 
-Reorder the icons in Foundry VTT's left scene toolbar and right sidebar. Keep each side separate. No cross-side movement, hidden controls, or hotbar changes.
+Arrange the left scene-control icons and right sidebar tabs in Foundry VTT. Optionally choose different background, icon and selected-icon highlight colors for each side. No icons can move from one side to the other.
 
-**Version:** 0.1.2 beta (2026-10-18)  
-**Compatibility target:** Foundry VTT v14; any game system.  
-**Status:** Automated tests passed. Not yet tested in a live Foundry v14 world.
+**Version:** 0.1.3 beta — October 18, 2026  
+**Requirements:** Foundry VTT v14; system-independent  
+**Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
 
-## Features
+## What you can do
 
-- Move left toolbar categories (Tokens, Tiles, Drawings, etc.) into your preferred order.
-- Arrange the tools within each left toolbar category separately.
-- Change the order of right sidebar tabs (Chat, Combat, Actors, Scenes, module-added tabs).
-- Use drag-and-drop or up/down arrows in the **Arrange Icons** window.
-- Automatically save a layout for **each user in each world**, across browser sessions.
-- **Reset to Defaults** without touching Actors, Scenes, macros, or document data.
+- Reorder the left toolbar categories (Tokens, Tiles, Drawings and module-added controls).
+- Reorder tools inside an individual left toolbar category.
+- Reorder right sidebar tabs (Chat, Combat, Actors, Scenes and module-added tabs).
+- Independently choose a **background**, **icon** and **active-icon highlight** color for the left toolbar or right sidebar *tab bar*.
+- Keep a separate arrangement and color selection for each user in each world. Changes save automatically.
+- Restore **Default Colors** without changing saved icon order, or **Reset Icon Order** without changing colors.
 
-## Install the v0.1.2 beta
+All color checkboxes are **off by default**, and unchecked properties use the ordinary Foundry theme. Color changes affect only the left scene controls and right sidebar tab navigation, **not** sidebar contents, other game windows or the macro hotbar. If chosen colors make icons hard to distinguish, uncheck them or use **Restore Default Colors**.
 
-This prerelease is for testing in Foundry v14, not a verified live release.
+## Installation — v0.1.3 beta
 
-**Foundry installer:** In **Setup > Add-on Modules > Install Module**, paste this version-pinned manifest URL:
+In **Foundry Setup > Add-on Modules > Install Module**, paste this version-pinned manifest:
 
-`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.2/module.json`
+`https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.3/module.json`
 
-**Manual installation:** Download `foundry-nav-order-0.1.2.zip` from [the v0.1.2 release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.2), then:
+Or download the ZIP from the [v0.1.3 beta release](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.3) and extract it directly to `Data/modules/foundry-nav-order/`, with `module.json` at that directory's root.
 
-1. Back up `Data/modules/foundry-nav-order`, if it exists. Use a test world.
-2. Stop Foundry before replacing existing module files.
-3. Extract the ZIP contents directly into `Data/modules/foundry-nav-order/`, with `module.json` at the root.
-4. Restart Foundry, enable **AFT Navbar Customizer** in the world and refresh your browser.
-5. Open **Game Settings > Configure Settings > Module Settings > Arrange Icons**.
+**Upgrading:** Back up the existing module folder; stop Foundry before manual replacement; restart Foundry and refresh the client. The module ID remains `foundry-nav-order`. This is **not** a new/additional module. Existing v0.1.0–v0.1.2 icon order preferences are retained. Earlier manifests use version-pinned URLs and may not discover upgrades automatically. In the St. Louis installation, the Samba path is `Z:\Data\modules\foundry-nav-order`.
 
-For the private St. Louis Samba deployment, modules are under `Z:\Data\modules`.
+## Use
 
-## Verify enablement in Foundry
+1. Enable **AFT Navbar Customizer** in your test world under **Game Settings > Manage Modules** (as GM).
+2. Open a Scene, then choose **Game Settings > Configure Settings > Module Settings > Arrange Icons**.
+3. Drag icon rows or use up/down arrows. Changing a category's tools or the right tabs is independent of the other lists.
+4. In **Appearance**, tick any desired custom color and choose a color swatch. The **Left toolbar** and **Right sidebar tabs** have separate controls.
+5. Use **Restore Default Colors** to turn off all custom colors. **Reset Icon Order** only resets the order. Click **Done** when finished.
 
-In an active world, open **Game Settings > Manage Modules** as GM and search for **AFT Navbar Customizer**. The checked box means it is enabled **for that world**; unchecked means installed but disabled. You can also see the activation state of the other installed modules in that window. This module does not change module enablement, and GitHub cannot read your live world's active module list.
+Changes save for your user in the current world; another player may select a different layout and colors. Colors are displayed immediately without manually refreshing. The right sidebar's contents remain in Foundry's existing colors.
 
-**Upgrading from v0.1.0 or v0.1.1:** All versions use the *same* module ID (`foundry-nav-order`). There is no second module to enable and no data migration. The v0.1.0 beta used a version-pinned manifest that may not discover later versions automatically. If it does not offer the update, back up the existing `Data/modules/foundry-nav-order` folder, stop Foundry, replace its contents with the v0.1.1 release ZIP, then restart and refresh the client. Do **not** rename the installed folder or delete character/world data.
+## Compatibility and beta limitations
 
-## First use
+The left toolbar uses native v14 scene-control ordering fields. Sidebar tabs use their existing DOM nodes (no replacement of native actions). Styling targets Foundry's v14 `#scene-controls` and sidebar tab navigation structure. UI replacement modules may change those elements, so third-party themes can conflict. The **right-sidebar tab bar**, dynamic third-party tabs, highlighted controls and GM/player color persistence still need real v14 checks.
 
-Choose left categories, a category's tools, or right tabs, then drag rows or use the arrow buttons. Changes save automatically for the current user. Select **Done** to close the window. **Reset to Defaults** restores the native icon order on both sides for that user.
-
-Open a Scene to populate the left category list. Controls unavailable to the current user's role do not appear. Module-added controls become available after Foundry renders them.
-
-## How it works and limitations
-
-Left controls use the native v14 `getSceneControlButtons` hook and `SceneControl.order`/`SceneControlTool.order` values. Right tabs are existing sidebar DOM nodes that this module reorders after rendering. Sidebar DOM structure can vary by Foundry build or UI-replacement module, so **the right sidebar still needs a real v14 smoke test**.
-
-This module does not duplicate native controls, replace callbacks, alter active tabs intentionally, generate macros, or write to world documents. Its only persistent change is a user-scoped setting.
+This module does **not** modify game documents, Actors, Scenes, Journals, macros, hotbar placements, or module activation state. It stores separate user-scoped `layout` (existing) and `appearance` (new) settings. Colors use strict six-digit hex validation, and no custom CSS code can be entered.
 
 ## Rollback
 
-Disable the module in **Manage Modules**, then reload. Native Foundry ordering returns. To uninstall, stop Foundry and remove only `Data/modules/foundry-nav-order/`. Saved user preferences remain dormant while the module is disabled; clear them with **Reset to Defaults** before uninstalling if desired. No game-document migration is performed.
+Disable the module and reload the client to return to Foundry's ordinary icon order and colors. A manual rollback to [v0.1.2](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.2) is possible using the backed-up module folder or earlier complete ZIP. v0.1.2 ignores the new appearance setting; if returning to v0.1.3 later, the saved color choices may reappear. Use **Restore Default Colors** before downgrading if you want to clear them. Code rollback does not require a world-data restoration because no world documents are migrated.
 
-## Source, tests and support
+## Source, support and license
 
-- Source: https://github.com/rebsiot/navbar-customizer
-- Local checks: `npm test` (Node 22+; no dependencies) and `npm run check`.
-- Report issues: https://github.com/rebsiot/navbar-customizer/issues (include Foundry v14 build number, browser, affected UI modules and a screenshot).
-- Version history: [CHANGELOG.md](CHANGELOG.md).
+- [Source repository](https://github.com/rebsiot/navbar-customizer)
+- [Issues and support](https://github.com/rebsiot/navbar-customizer/issues)
+- [Release history](CHANGELOG.md)
+- Automated local checks: `npm run check` and `npm test` with Node 22+.
 
-**Licensing:** No public software redistribution license has been selected yet. The public source repository is not an official Foundry package listing. The repository includes no licensed TC Modern artwork, characters, world data, credentials, or session material.
+No public software redistribution license has been selected. The repository and release do not include licensed creator art, credentials, world data, or player-private information. This GitHub beta is not an official Foundry package listing.

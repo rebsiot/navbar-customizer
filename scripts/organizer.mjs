@@ -1,8 +1,31 @@
 import { escapeHtml, orderedIds, safeIconClasses } from "./layout.mjs";
+import { getAppearance, saveAppearance, resetAppearance } from "./appearance.mjs";
 import {
   getLayout, getLeftControls, getRightTabs, getToolsFor,
   localizedLabel, saveLayout, resetLayout
 } from "./runtime.mjs";
+
+const COLOR_FIELDS = [
+  { id: "background", label: "Background", suggested: "#243448" },
+  { id: "icons", label: "Icons", suggested: "#e8eef5" },
+  { id: "active", label: "Active icon highlight", suggested: "#286dc2" }
+];
+
+function appearanceFieldsHtml(side, appearance) {
+  return COLOR_FIELDS.map(field => {
+    const saved = appearance[side][field.id];
+    const name = `${side} ${field.label.toLowerCase()}`;
+    const value = saved ?? field.suggested;
+    return `<div class="fno-color-field">
+      <label class="fno-color-toggle-label">
+        <input type="checkbox" class="fno-theme-toggle" data-side="${side}" data-field="${field.id}" ${saved ? "checked" : ""}>
+        ${escapeHtml(field.label)}
+      </label>
+      <input type="color" class="fno-theme-picker" data-side="${side}" data-field="${field.id}"
+             value="${value}" aria-label="Choose ${escapeHtml(name)} color" ${saved ? "" : "disabled"}>
+    </div>`;
+  }).join("");
+}
 
 const ApplicationV2 = foundry.applications.api.ApplicationV2;
 
@@ -42,8 +65,8 @@ export class NavOrganizerApp extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "foundry-nav-order-arranger",
     classes: ["fno-app"],
-    window: { title: "Arrange Navigation Icons", resizable: true, minimizable: false },
-    position: { width: 830, height: 650 }
+    window: { title: "Arrange Icons & Colors", resizable: true, minimizable: false },
+    position: { width: 830, height: 730 }
   };
 
   constructor(options = {}) {
@@ -56,6 +79,7 @@ export class NavOrganizerApp extends ApplicationV2 {
 
   async _renderHTML(_context, _options) {
     const layout = getLayout();
+    const appearance = getAppearance();
     const controls = getLeftControls();
     const rightTabs = getRightTabs();
     if (!controls.some(entry => entry.id === this.selectedControl)) this.selectedControl = controls[0]?.id ?? null;
@@ -63,7 +87,7 @@ export class NavOrganizerApp extends ApplicationV2 {
     const container = document.createElement("div");
     container.className = "fno-panel";
     container.innerHTML = `
-      <p class="fno-intro">Drag rows or use the arrow buttons. Changes are saved automatically for your user in this world. Only the icon order changes.</p>
+      <p class="fno-intro">Drag rows or use the arrow buttons. Changes are saved automatically for your user in this world. Choose optional colors below; icon order and colors are independent.</p>
       <div class="fno-columns">
         <section class="fno-column" aria-labelledby="fno-left-title">
           <h2 id="fno-left-title"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Left toolbar</h2>
@@ -82,10 +106,19 @@ export class NavOrganizerApp extends ApplicationV2 {
           <ol class="fno-list" data-area="right" aria-label="Right sidebar tabs">${rowsHtml(rightTabs, layout.right)}</ol>
         </section>
       </div>
+      <section class="fno-appearance" aria-labelledby="fno-appearance-title">
+        <h2 id="fno-appearance-title"><i class="fa-solid fa-palette" aria-hidden="true"></i> Appearance</h2>
+        <p class="fno-appearance-help">Optional colors for each navigation bar. Unchecked options use your Foundry theme. Colors apply immediately.</p>
+        <div class="fno-color-columns">
+          <fieldset class="fno-color-panel"><legend>Left toolbar</legend>${appearanceFieldsHtml("left", appearance)}</fieldset>
+          <fieldset class="fno-color-panel"><legend>Right sidebar tabs</legend>${appearanceFieldsHtml("right", appearance)}</fieldset>
+        </div>
+        <button type="button" class="fno-restore-colors" data-fno-action="restore-colors"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Restore Default Colors</button>
+      </section>
       <footer class="fno-footer">
         <span class="fno-status" role="status" aria-live="polite">Ready</span>
         <div class="fno-buttons">
-          <button type="button" data-fno-action="defaults" class="fno-defaults"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset to Defaults</button>
+          <button type="button" data-fno-action="defaults" class="fno-defaults"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> Reset Icon Order</button>
           <button type="button" data-fno-action="close"><i class="fa-solid fa-check" aria-hidden="true"></i> Done</button>
         </div>
       </footer>`;
@@ -120,6 +153,10 @@ export class NavOrganizerApp extends ApplicationV2 {
         void this.#reset(root);
         return;
       }
+      if (button.dataset.fnoAction === "restore-colors") {
+        void this.#resetColors(root);
+        return;
+      }
       const move = button.dataset.move;
       if (move !== "up" && move !== "down") return;
       const row = button.closest("li[data-id]");
@@ -132,6 +169,26 @@ export class NavOrganizerApp extends ApplicationV2 {
       } else return;
       this.#updateArrows(root);
       void this.#commit(root);
+    });
+
+    root.addEventListener("change", event => {
+      const input = event.target;
+      if (!input.matches?.(".fno-theme-toggle, .fno-theme-picker")) return;
+      const side = input.dataset.side;
+      const field = input.dataset.field;
+      if (!["left", "right"].includes(side) || !COLOR_FIELDS.some(entry => entry.id === field)) return;
+      const next = getAppearance();
+      if (input.classList.contains("fno-theme-toggle")) {
+        const picker = root.querySelector(`.fno-theme-picker[data-side="${side}"][data-field="${field}"]`);
+        if (!picker) return;
+        picker.disabled = !input.checked;
+        next[side][field] = input.checked ? picker.value : null;
+      } else {
+        const toggle = root.querySelector(`.fno-theme-toggle[data-side="${side}"][data-field="${field}"]`);
+        if (!toggle?.checked) return;
+        next[side][field] = input.value;
+      }
+      void this.#commitAppearance(root, next);
     });
 
     root.addEventListener("dragstart", event => {
@@ -224,6 +281,53 @@ export class NavOrganizerApp extends ApplicationV2 {
       console.error("foundry-nav-order | Could not reset layout", error);
       this.#setStatus(root, "Reset failed. Please retry.");
       ui.notifications.error("Navigation Organizer could not reset your layout.");
+    }
+  }
+
+  #restoreAppearanceInputs(root) {
+    const appearance = getAppearance();
+    for (const side of ["left", "right"]) {
+      for (const field of COLOR_FIELDS) {
+        const toggle = root.querySelector(`.fno-theme-toggle[data-side="${side}"][data-field="${field.id}"]`);
+        const picker = root.querySelector(`.fno-theme-picker[data-side="${side}"][data-field="${field.id}"]`);
+        if (!toggle || !picker) continue;
+        toggle.checked = !!appearance[side][field.id];
+        picker.disabled = !toggle.checked;
+        picker.value = appearance[side][field.id] ?? field.suggested;
+      }
+    }
+  }
+
+  async #commitAppearance(root, value) {
+    this.#setStatus(root, "Saving colors…");
+    const ticket = ++this.statusTicket;
+    try {
+      await saveAppearance(value);
+      if (ticket === this.statusTicket) this.#setStatus(root, "Colors saved for your user");
+    } catch (error) {
+      console.error("foundry-nav-order | Could not save color preferences", error);
+      if (ticket !== this.statusTicket) return;
+      this.#restoreAppearanceInputs(root);
+      this.#setStatus(root, "Color save failed. Try again.");
+      ui.notifications.error("AFT Navbar Customizer could not save your colors.");
+    }
+  }
+
+  async #resetColors(root) {
+    this.#setStatus(root, "Restoring Foundry colors…");
+    const ticket = ++this.statusTicket;
+    try {
+      await resetAppearance();
+      if (ticket !== this.statusTicket) return;
+      this.#restoreAppearanceInputs(root);
+      this.#setStatus(root, "Foundry colors restored");
+      ui.notifications.info("Default navigation colors restored. Icon order was not changed.");
+    } catch (error) {
+      console.error("foundry-nav-order | Could not restore default colors", error);
+      if (ticket !== this.statusTicket) return;
+      this.#restoreAppearanceInputs(root);
+      this.#setStatus(root, "Could not restore colors. Try again.");
+      ui.notifications.error("AFT Navbar Customizer could not restore default colors.");
     }
   }
 

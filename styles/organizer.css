@@ -26,3 +26,18 @@
 .fno-app .fno-buttons button { width: auto; padding: 6px 12px; margin: 0; }
 .fno-app .fno-defaults { color: var(--color-text-primary, inherit); }
 @media (max-width: 660px) { .fno-app .fno-columns { grid-template-columns: 1fr; } .fno-app .fno-help { min-height: 0; } }
+
+/* The appearance form is part of the organizer dialog. Game UI theme rules are
+   generated separately and only when a user has enabled a custom color. */
+.fno-app .fno-appearance { border-top: 1px solid var(--color-border-light, #777); margin-top: 18px; padding-top: 14px; }
+.fno-app .fno-appearance-help { margin: 4px 0 11px; opacity: 0.83; line-height: 1.4; }
+.fno-app .fno-color-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.fno-app .fno-color-panel { min-width: 0; padding: 8px 10px 10px; border: 1px solid var(--color-border-light, #888); border-radius: 6px; }
+.fno-app .fno-color-panel legend { font-weight: 600; padding: 0 5px; }
+.fno-app .fno-color-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0; }
+.fno-app .fno-color-toggle-label { display: flex; align-items: center; gap: 7px; margin: 0; cursor: pointer; font-size: 13px; opacity: 1; }
+.fno-app .fno-color-toggle-label input { margin: 0; }
+.fno-app .fno-theme-picker { flex: 0 0 58px; width: 58px; height: 30px; padding: 2px; cursor: pointer; }
+.fno-app .fno-theme-picker:disabled { opacity: 0.4; cursor: default; }
+.fno-app .fno-restore-colors { display: inline-flex; align-items: center; gap: 7px; width: auto; max-width: 100%; margin: 10px 0 0; padding: 6px 12px; }
+@media (max-width: 660px) { .fno-app .fno-color-columns { grid-template-columns: 1fr; } }
