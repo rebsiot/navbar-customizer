@@ -1,5 +1,5 @@
 import { EMPTY_LAYOUT, normalizeLayout, sortedEntries, applySceneOrders, orderedIds, reorderTabElements } from "./layout.mjs";
-import { applySceneVisibility, applySidebarVisibility, canUserHide, getVisibility, isHidden } from "./visibility.mjs";
+import { applySceneVisibility, applySceneDomVisibility, applySidebarVisibility, canUserHide, getVisibility, isHidden } from "./visibility.mjs";
 
 export const MODULE_ID = "foundry-nav-order";
 export const SETTING_KEY = "layout";
@@ -196,10 +196,14 @@ export function applyLayoutToUI({ left = true, right = true } = {}) {
     try { applyRightOrder(); } catch (error) { warn("Could not reorder sidebar tabs", error); }
   }
   if (left) {
+    try { applySceneDomVisibility(); } catch (error) { warn("Could not apply scene icon visibility", error); }
     const controls = ui.controls;
     if (controls?.render) {
-      Promise.resolve(controls.render({ reset: true }))
-        .catch(error => warn("Could not refresh scene controls", error));
+      Promise.resolve().then(() => controls.render({ reset: true }))
+        .catch(error => warn("Could not refresh scene controls", error))
+        .finally(() => {
+          try { applySceneDomVisibility(); } catch (error) { warn("Could not sync scene icon visibility", error); }
+        });
     }
   }
 }
@@ -290,6 +294,16 @@ export function reconcilePreparedControls(controls = currentControlRecord()) {
   return false;
 }
 
+/** Register this second hook during ready, after module-added tool callbacks
+ * registered during init. It reapplies visibility before v14 prepares the
+ * rendered controls, while the original hook keeps the recovery baseline. */
+export function finalizeSceneControlButtons(controls) {
+  if (!controls || typeof controls !== "object") return;
+  rememberNewControls(controls);
+  applySceneOrders(controls, currentLayout);
+  applySceneVisibility(controls, getVisibility(), canUserHide());
+}
+
 /** Re-render prepared controls *without* resetting the native control record.
  * This preserves additions from hooks that ran after ours. Guard the second
  * render to avoid a recursive render loop. */
@@ -297,6 +311,7 @@ export function attachSceneControlEvents() {
   const controls = ui.controls;
   if (!controls?.addEventListener) return;
   controls.addEventListener("render", () => {
+    try { applySceneDomVisibility(); } catch (error) { warn("Scene DOM visibility failed", error); }
     if (sceneRefreshPending) return;
     queueMicrotask(() => {
       if (sceneRefreshPending || controls !== ui.controls) return;
@@ -307,7 +322,10 @@ export function attachSceneControlEvents() {
       sceneRefreshPending = true;
       Promise.resolve().then(() => controls.render({ reset: false }))
         .catch(error => warn("Could not refresh additional scene tools", error))
-        .finally(() => { sceneRefreshPending = false; });
+        .finally(() => {
+          sceneRefreshPending = false;
+          try { applySceneDomVisibility(); } catch (error) { warn("Could not sync late scene DOM", error); }
+        });
     });
   });
 }

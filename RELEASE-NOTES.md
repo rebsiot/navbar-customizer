@@ -1,26 +1,25 @@
-# AFT Navbar+ v0.1.8 (Beta) — Missing module toolbar tools
+# AFT Navbar+ v0.1.9 (Beta) — Player Hide/Show visibility
 
-The **Arrange Icon Order** window can now find tools added by other modules to the selected toolbar category. Previously it could show only the core tools because AFT Navbar+ captured the toolbar list before other modules had finished adding their controls.
+## Fix
 
-## What's fixed
+Player and Trusted Player Hide/Show preferences now have an additional client-side rendering pass so that an icon marked **Hidden** is also concealed from that player's Foundry navigation UI, even when a subsequent addon overwrites the native toolbar visibility flag. The original native visibility hooks remain in place, and a late hook pass also applies preferences to tools registered after AFT Navbar+.
 
-- The category and subtool lists use Foundry v14's prepared scene controls, including tools/categories added by later native hook subscribers.
-- Saved ordering and per-user Hide/Show preferences are re-applied to late-added tools after render, with a guarded one-time refresh. Native buttons and their actions remain unchanged.
-- Hidden tools remain available in the organizer for restoring. Foundry/user-inaccessible controls remain excluded.
-- Separate **Arrange Icon Order** and **Change Colors** settings, your saved colors, GM hide permissions and existing module ID are unchanged.
+This is **visual customization**, not a module disable feature or a permissions control. Each user's saved `visibility` choice remains independent. Other player/GM layouts, color settings, world documents and installed module IDs are unchanged. The native Settings sidebar tab is still protected against hiding.
 
 ## Install / update
 
-Use Foundry Setup → Add-on Modules → Update if already on v0.1.5 or newer. The existing permanent manifest automatically offers this version:
+Use **Foundry Setup → Add-on Modules → Update** if your installed version is v0.1.5 or later. The permanent manifest does not change:
 
 `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`
 
-For a manual update, download the complete `foundry-nav-order-0.1.8.zip`, back up `Data/modules/foundry-nav-order`, stop Foundry, replace its contents, restart, and refresh the client. Do not create a differently named module folder. See README for upgrades from earlier pinned-manifest versions.
+For a manual update, back up `Data/modules/foundry-nav-order` (or `Z:\Data\modules\foundry-nav-order`), stop Foundry, replace the existing folder contents with the full `foundry-nav-order-0.1.9.zip` and restart. Do not rename the module folder. Older version-pinned manifests require a one-time transition as described in README.
 
-## Known limitations / verification
+## Verification and limitations
 
-Automated syntax and mock tests cover multiple third-party native `getSceneControlButtons` additions, hide/order persistence, permission filtering and avoiding redraw loops. No actual Foundry v14 GM/player test has yet run. Modules that inject toolbar buttons directly into DOM outside Foundry's native control registry may still be absent from the organizer; third-party themes can also affect layout.
+Mock tests cover ordinary and Trusted Players; native and late-added categories/tools; a later addon overwriting `visible`; reversible rendering; active sidebar-tab handling; GM access revocation and failed saves. Real Foundry v14 player-browser acceptance is **not yet confirmed**. Addons that inject entirely custom toolbar DOM without Foundry's native data identifiers may still require compatibility work. Do not interpret passing mock tests as live deployment.
 
-Rollback: restore the previous complete module folder or v0.1.7 ZIP. Preferences remain stored under the same user/world setting keys; no world-document migration occurs.
+**First live test:** Log in as a non-GM Player while the GM has selected **All Players** under **Who Can Hide Icons**. Use **AFT Navbar+ → Arrange Icon Order** to hide an addon toolbar subtool; verify it disappears immediately, survives refresh, and returns on Show. Repeat with a Trusted Player if using the Trusted Players threshold.
+
+**Rollback:** Restore the backed-up complete module folder or install the [v0.1.8 ZIP](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.8). No world-data migration. Saved settings remain under the same keys.
 
 Source and issues: https://github.com/rebsiot/navbar-customizer

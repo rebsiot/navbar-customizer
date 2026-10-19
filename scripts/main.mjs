@@ -9,7 +9,7 @@ import {
 } from "./appearance.mjs";
 import {
   MODULE_ID, SETTING_KEY, initializeLayoutFromSettings,
-  settingsChanged, updateSceneControls, sidebarRendered, attachSidebarEvents, attachSceneControlEvents, applyLayoutToUI
+  settingsChanged, updateSceneControls, finalizeSceneControlButtons, sidebarRendered, attachSidebarEvents, attachSceneControlEvents, applyLayoutToUI
 } from "./runtime.mjs";
 
 Hooks.once("init", () => {
@@ -81,10 +81,12 @@ Hooks.on("getSceneControlButtons", updateSceneControls);
 Hooks.on("renderSidebar", sidebarRendered);
 
 Hooks.once("ready", () => {
+  // A late pass catches tools which other modules register after our first hook.
+  Hooks.on("getSceneControlButtons", finalizeSceneControlButtons);
   attachSceneControlEvents();
   initializeLayoutFromSettings();
   initializeAppearanceFromSettings();
   initializeVisibilityFromSettings(applyLayoutToUI);
   attachSidebarEvents();
-  console.info(`${MODULE_ID} | v0.1.8 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
+  console.info(`${MODULE_ID} | v0.1.9 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
 });

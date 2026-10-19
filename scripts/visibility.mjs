@@ -175,3 +175,65 @@ export async function saveVisibility(value) {
 }
 
 export function resetVisibility() { return saveVisibility(EMPTY_VISIBILITY); }
+
+
+/** Direct DOM reconciliation for native SceneControls when another module
+ * changes a tool's visibility after the getSceneControlButtons hook. This is
+ * a per-client presentation fallback, not a permissions/access control. Only
+ * elements within the native SceneControls application are considered. */
+const sceneDomOriginals = new WeakMap();
+
+function restoreSceneDomNode(node, original) {
+  node.hidden = original.hidden;
+  if (node.style) {
+    if (original.display) node.style.setProperty?.("display", original.display, original.priority);
+    else if (node.style.removeProperty) node.style.removeProperty("display");
+    else node.style.display = "";
+  }
+  if (original.ariaHidden === null) node.removeAttribute?.("aria-hidden");
+  else node.setAttribute?.("aria-hidden", original.ariaHidden);
+  sceneDomOriginals.delete(node);
+}
+
+/** Keep the actual rendered controls in sync with a player's saved choices.
+ * Return the number of nodes newly hidden or restored. Native scene control
+ * callbacks, permissions, registrations and module state are never altered. */
+export function applySceneDomVisibility(root = ui.controls?.element, selectedControl = ui.controls?.control?.name) {
+  const container = root?.querySelectorAll ? root :
+    document.getElementById?.("scene-controls") ?? document.getElementById?.("controls");
+  if (!container?.querySelectorAll) return 0;
+  const canHide = canUserHide();
+  const hidden = canHide ? normalizeVisibility(current) : EMPTY_VISIBILITY;
+  const hiddenControls = new Set(hidden.left);
+  let updated = 0;
+  for (const node of container.querySelectorAll("[data-control], [data-tool], [data-tab]")) {
+    const controlId = node.dataset?.control ||
+      (node.dataset?.tab && node.dataset.tab !== "settings" ? node.dataset.tab : null);
+    const toolId = node.dataset?.tool;
+    const parentControl = node.closest?.("[data-control]")?.dataset?.control;
+    const toolGroup = parentControl || node.dataset?.control || selectedControl;
+    const shouldHide = canHide && (
+      (controlId && hiddenControls.has(controlId)) ||
+      (toolId && toolGroup && (hidden.tools[toolGroup] ?? []).includes(toolId))
+    );
+    const original = sceneDomOriginals.get(node);
+    if (shouldHide) {
+      if (original) continue;
+      sceneDomOriginals.set(node, {
+        hidden: Boolean(node.hidden),
+        display: node.style?.getPropertyValue?.("display") ?? node.style?.display ?? "",
+        priority: node.style?.getPropertyPriority?.("display") ?? "",
+        ariaHidden: node.getAttribute?.("aria-hidden") ?? null
+      });
+      node.hidden = true;
+      if (node.style?.setProperty) node.style.setProperty("display", "none", "important");
+      else if (node.style) node.style.display = "none";
+      node.setAttribute?.("aria-hidden", "true");
+      updated++;
+    } else if (original) {
+      restoreSceneDomNode(node, original);
+      updated++;
+    }
+  }
+  return updated;
+}

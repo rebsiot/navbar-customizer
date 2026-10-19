@@ -2,7 +2,7 @@
 
 Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolbar and right sidebar. Hidden icons can always be restored. Changes affect only your own interface; nothing moves between sides.
 
-**Version:** 0.1.8 beta — October 18, 2026  
+**Version:** 0.1.9 beta — October 18, 2026  
 **Previously named:** AFT Navbar Customizer; the module ID and your saved settings are unchanged.  
 **Requirements:** Foundry VTT v14; system-independent  
 **Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
@@ -31,15 +31,15 @@ Use this **permanent Foundry manifest URL**. It will not change for future relea
 
 In **Foundry Setup > Add-on Modules > Install Module**, paste that link and install. The Foundry **Update** or **Update All** action will then check it for new versions. Foundry does not install updates unattended.
 
-**Already on v0.1.5–v0.1.7:** Use Setup > Add-on Modules > Update. The permanent manifest is unchanged and should offer v0.1.8. This update fixes discovery of module-added scene-control categories and tools; it does not create a second module.
+**Already on v0.1.5–v0.1.8:** Use Setup > Add-on Modules > Update. The permanent manifest is unchanged and advertises v0.1.9. This release improves player Hide/Show rendering; it does not create a second module.
 
 **Upgrading from v0.1.0–v0.1.4:** Those installs include a manifest pinned to an old GitHub release, so their Update button cannot discover this version. Make a backup and **do one manual transition**:
 
 1. Stop Foundry and back up your existing `Data/modules/foundry-nav-order/` folder.
-2. Download the [complete v0.1.8 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.8/foundry-nav-order-0.1.8.zip) and extract its contents into that same folder (do not create an additional directory).
-3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar+ v0.1.8**. After that, Update will follow the permanent manifest link.
+2. Download the [complete v0.1.9 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.9/foundry-nav-order-0.1.9.zip) and extract its contents into that same folder (do not create an additional directory).
+3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar+ v0.1.9**. After that, Update will follow the permanent manifest link.
 
-Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar+; it should find v0.1.8 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
+Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar+; it should find v0.1.9 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
 
 For the St. Louis Samba installation, the folder is `Z:\Data\modules\foundry-nav-order`. Only module code is replaced; existing world data and per-user settings are not migrated. Avoid uninstalling/reinstalling unless otherwise necessary.
 
@@ -69,6 +69,12 @@ This controls only **Hide/Show** and **Restore All Hidden Icons**. Ordering and 
 
 **Safety:** The **Settings** sidebar tab cannot be hidden. When hiding the currently active sidebar tab, the module tries to activate Settings first. If it cannot switch safely, it keeps the active icon visible instead. A tab that is hidden in your interface remains registered in Foundry.
 
+## Player Hide/Show visual synchronization (v0.1.9)
+
+Some combinations of Foundry v14 and other interface modules can re-enable a toolbar button after AFT's original visibility hook, so the organizer indicates **Hidden** while the button remains on screen. v0.1.9 adds a late native hook pass plus a reversible client-side presentation fallback. The fallback only touches identifiable buttons within Foundry's own SceneControls area (native `data-control`, `data-tool` or `data-tab` attributes). It never unregisters actions, changes Foundry permissions, removes world documents or affects another user's display.
+
+The fallback preserves original inline display and `aria-hidden` values when an icon is shown again or a GM withdraws Hide/Show permission. This applies to both ordinary Players and Trusted Players, provided the GM selected an appropriate **Who Can Hide Icons** minimum role. Sidebar tabs still use their existing native DOM-based visibility handling; the **Settings** tab cannot be hidden. If a module replaces the toolbar with custom markup lacking native identifiers, additional module-specific compatibility work may be necessary.
+
 ## Module-added toolbar controls (fixed in v0.1.8)
 
 The **Tools within a category** list now reads Foundry v14's fully prepared scene controls rather than an early snapshot taken before all modules finish adding buttons. AFT Navbar+ can therefore list native and module-added controls together, including controls added by a later `getSceneControlButtons` hook. Previously missing tools may now appear when choosing **Token Controls** or another category. This does not change your existing saved icon order or hidden/color preferences.
@@ -77,13 +83,13 @@ When a module adds a tool after AFT Navbar+'s hook has run, AFT can re-apply you
 
 ## Compatibility and beta limitations
 
-The left toolbar uses native v14 scene-control ordering and visibility fields. Sidebar tabs use their existing DOM nodes (no replacement of native actions). Styling targets Foundry's v14 `#scene-controls` and sidebar tab navigation structure. UI replacement modules may change those elements, so third-party themes can conflict. The **right-sidebar tab bar**, dynamic third-party tabs, hidden active tools, permission changes, highlighted controls and GM/player color persistence still need real v14 checks.
+The left toolbar uses native v14 scene-control ordering/visibility fields plus a scoped DOM fallback for late-rendered buttons. Sidebar tabs use their existing DOM nodes (no replacement of native actions). Styling targets Foundry's v14 `#scene-controls` and sidebar tab navigation structure. UI replacement modules may change those elements, so third-party themes can conflict. The **right-sidebar tab bar**, dynamic third-party tabs, hidden active tools, permission changes, highlighted controls and GM/player color persistence still need real v14 checks.
 
 This module does **not** modify game documents, Actors, Scenes, Journals, macros, hotbar placements, or module activation state. It stores separate user-scoped `layout`, `appearance`, and `visibility` settings, plus one GM-controlled world setting for hiding access. Colors use strict six-digit hex validation, and no custom CSS code can be entered.
 
 ## Rollback
 
-Disable the module and reload the client to return to Foundry's ordinary icon order, visibility and colors. A manual rollback to [v0.1.7](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.7) is possible using the backed-up module folder or earlier complete ZIP. A code rollback to v0.1.7 retains the existing visibility feature and user preferences, but has the original missing-addon-tool issue. Disable the module and reload for immediate UI rollback; do not remove saved settings unless you intentionally reset them. Existing colors/order are preserved. Code rollback does not require a world-data restoration because no world documents are migrated.
+Disable the module and reload the client to return to Foundry's ordinary icon order, visibility and colors. A manual rollback to [v0.1.8](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.8) is possible using the backed-up module folder or earlier complete ZIP. A code rollback to v0.1.8 retains Hide/Show and addon tool discovery, but may restore the player visibility issue. Disable the module and reload for immediate UI rollback; do not remove saved settings unless you intentionally reset them. Existing colors/order are preserved. Code rollback does not require a world-data restoration because no world documents are migrated.
 
 ## Source, support and license
 

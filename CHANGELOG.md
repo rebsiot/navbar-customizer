@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9 — 2026-10-18 (beta player visibility)
+
+- Fixed a player-facing Hide/Show rendering gap: saved preferences could change the organizer to **Hidden** while module-added toolbar icons remained visible because other modules changed the prepared controls afterward.
+- Added a late `getSceneControlButtons` pass applying per-user ordering and visibility after early module registration, without deleting native entries or replacing their action callbacks.
+- Added scoped post-render visual reconciliation of native scene control/category/tool/tab buttons using the Foundry control element and native data attributes; originals are restored when shown, after permission revocation or during rollback.
+- Added eight player-focused mock tests covering ordinary/Trusted Player roles, addon override, category and tool hiding, sidebar restoration, saving failures, exact style restoration, and permissions. The existing 61 tests remain the regression baseline.
+- Preserved `foundry-nav-order`, AFT Navbar+ title, color/arrangement windows, user settings (`layout`, `visibility`, `appearance`), GM `minimumHideRole` and stable update manifest. No world-document or player-content migration.
+- Real-world Foundry v14/player sessions and third-party replacement toolbar markup still require live acceptance testing.
+
 ## 0.1.8 — 2026-10-18 (beta)
 
 - Fixed the **Tools within a category** list missing additional tools registered after AFT Navbar+'s `getSceneControlButtons` hook. The organizer now reads the fully prepared native v14 controls, with the live hook record as an early fallback.
