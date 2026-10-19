@@ -2,7 +2,7 @@
 
 Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolbar and right sidebar. Hidden icons can always be restored. Changes affect only your own interface; nothing moves between sides.
 
-**Version:** 0.1.9 beta — October 18, 2026  
+**Version:** 0.1.10 beta — October 18, 2026  
 **Previously named:** AFT Navbar Customizer; the module ID and your saved settings are unchanged.  
 **Requirements:** Foundry VTT v14; system-independent  
 **Verification:** Automated/mock-tested. Not yet verified in a live Foundry v14 world.
@@ -14,6 +14,7 @@ Arrange, recolor, and optionally hide icons in Foundry VTT’s left scene toolba
 - Reorder the left toolbar categories (Tokens, Tiles, Drawings and module-added controls).
 - Reorder tools inside an individual left toolbar category.
 - Reorder right sidebar tabs (Chat, Combat, Actors, Scenes and module-added tabs).
+- Apply saved ordering automatically when entering a game; no manual browser refresh or scene switch should be needed.
 - Independently choose a **background**, **icon** and **active-icon highlight** color for the left toolbar or right sidebar *tab bar*.
 - Hide or show individual left categories, left subtools or right sidebar tab icons using an eye button next to the up/down arrows. Hidden entries remain in the organizer.
 - GMs can allow hiding for **GMs only** (default), **Trusted Players and above**, or **All Players** through a world setting.
@@ -31,15 +32,15 @@ Use this **permanent Foundry manifest URL**. It will not change for future relea
 
 In **Foundry Setup > Add-on Modules > Install Module**, paste that link and install. The Foundry **Update** or **Update All** action will then check it for new versions. Foundry does not install updates unattended.
 
-**Already on v0.1.5–v0.1.8:** Use Setup > Add-on Modules > Update. The permanent manifest is unchanged and advertises v0.1.9. This release improves player Hide/Show rendering; it does not create a second module.
+**Already on v0.1.5–v0.1.9:** Use Setup > Add-on Modules > Update. The permanent manifest is unchanged and advertises v0.1.10. This release fixes first-login order timing; it does not create a second module.
 
 **Upgrading from v0.1.0–v0.1.4:** Those installs include a manifest pinned to an old GitHub release, so their Update button cannot discover this version. Make a backup and **do one manual transition**:
 
 1. Stop Foundry and back up your existing `Data/modules/foundry-nav-order/` folder.
-2. Download the [complete v0.1.9 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.9/foundry-nav-order-0.1.9.zip) and extract its contents into that same folder (do not create an additional directory).
-3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar+ v0.1.9**. After that, Update will follow the permanent manifest link.
+2. Download the [complete v0.1.10 ZIP](https://github.com/rebsiot/navbar-customizer/releases/download/v0.1.10/foundry-nav-order-0.1.10.zip) and extract its contents into that same folder (do not create an additional directory).
+3. Restart Foundry and refresh the browser. Verify that Setup shows **AFT Navbar+ v0.1.10**. After that, Update will follow the permanent manifest link.
 
-Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar+; it should find v0.1.9 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
+Alternatively, if you can safely edit the installed `Data/modules/foundry-nav-order/module.json`, back it up and replace **only** its `manifest` URL with the permanent link above. Restart Foundry, then use **Setup > Add-on Modules > Update** for AFT Navbar+; it should find v0.1.10 without manually replacing the ZIP. Do not change the module ID, version or download fields yourself.
 
 For the St. Louis Samba installation, the folder is `Z:\Data\modules\foundry-nav-order`. Only module code is replaced; existing world data and per-user settings are not migrated. Avoid uninstalling/reinstalling unless otherwise necessary.
 

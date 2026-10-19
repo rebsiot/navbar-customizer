@@ -129,7 +129,7 @@ let refresh = () => {};
 
 export function getVisibility() { return normalizeVisibility(current); }
 
-export function initializeVisibilityFromSettings(refreshUI = () => {}) {
+export function initializeVisibilityFromSettings(refreshUI = () => {}, { apply = true } = {}) {
   refresh = refreshUI;
   try {
     const saved = normalizeVisibility(game.settings.get(MODULE_ID, VISIBILITY_KEY));
@@ -137,7 +137,7 @@ export function initializeVisibilityFromSettings(refreshUI = () => {}) {
     confirmed = normalizeVisibility(saved);
   } catch (error) { console.warn("foundry-nav-order | Could not read hidden icons", error); }
   initialized = true;
-  refresh();
+  if (apply) refresh();
 }
 
 export function visibilitySettingsChanged(value) {

@@ -12,6 +12,12 @@ let initialized = false;
 let observedControls = null;
 let lastHookControls = null;
 let sceneRefreshPending = false;
+const attachedSceneControls = new WeakSet();
+const attachedSidebars = new WeakSet();
+// First game load may render controls after the ready hook, or replace the
+// initial controls application. Replay saved order once on that real render.
+let startupSceneReplayPending = false;
+let startupSceneReplayQueued = false;
 const sidebarBaselines = new WeakMap();
 
 const TAB_NAMES = {
@@ -236,14 +242,14 @@ export async function resetLayout() {
   return saveLayout(EMPTY_LAYOUT);
 }
 
-export function initializeLayoutFromSettings() {
+export function initializeLayoutFromSettings({ apply = true } = {}) {
   try {
     const initial = normalizeLayout(game.settings.get(MODULE_ID, SETTING_KEY));
     currentLayout = initial;
     confirmedLayout = normalizeLayout(initial);
   } catch (error) { warn("Could not read user layout", error); }
   initialized = true;
-  applyLayoutToUI({ left: true, right: true });
+  if (apply) applyLayoutToUI({ left: true, right: true });
 }
 
 export function settingsChanged(value) {
@@ -304,14 +310,68 @@ export function finalizeSceneControlButtons(controls) {
   applySceneVisibility(controls, getVisibility(), canUserHide());
 }
 
-/** Re-render prepared controls *without* resetting the native control record.
- * This preserves additions from hooks that ran after ours. Guard the second
- * render to avoid a recursive render loop. */
+/** A preference is only worth re-rendering for when it changes left controls.
+ * The sidebar is reordered in place and does not need a controls refresh. */
+function hasSavedScenePreferences() {
+  const visibility = canUserHide() ? getVisibility() : { left: [], tools: {} };
+  return Boolean(currentLayout.left.length ||
+    Object.values(currentLayout.tools).some(ids => ids.length) ||
+    visibility.left.length || Object.values(visibility.tools).some(ids => ids.length));
+}
+
+/** Called after preferences have been loaded at ready. Do not force an
+ * unrendered ApplicationV2 to render (the normal first render belongs to
+ * Foundry). On the first completed SceneControls render, request one replay. */
+export function initializeStartupOrder() {
+  startupSceneReplayPending = hasSavedScenePreferences();
+  attachSceneControlEvents();
+  try { applyRightOrder(); } catch (error) { warn("Could not arrange initial sidebar", error); }
+  const controls = ui.controls;
+  if (controls?.rendered) queueStartupSceneReplay(controls);
+}
+
+function queueStartupSceneReplay(controls = ui.controls) {
+  if (!startupSceneReplayPending || startupSceneReplayQueued || !controls?.render) return;
+  if (controls !== ui.controls) return;
+  startupSceneReplayQueued = true;
+  queueMicrotask(() => {
+    startupSceneReplayQueued = false;
+    if (!startupSceneReplayPending || controls !== ui.controls) return;
+    // Mark completed before rendering: our render listener must not recurse.
+    startupSceneReplayPending = false;
+    applyLayoutToUI({ left: true, right: false });
+  });
+}
+
+/** A scene can finish preparing after ready or create a different controls
+ * application. Reattach to the live instance without accumulating listeners. */
+export function startupCanvasReady() {
+  if (!initialized) return;
+  attachSceneControlEvents();
+  attachSidebarEvents();
+  try { applyRightOrder(); } catch (error) { warn("Could not arrange canvas-ready sidebar", error); }
+  if (ui.controls?.rendered) queueStartupSceneReplay(ui.controls);
+}
+
+/** Foundry's generic render hook is also emitted for a controls instance
+ * constructed after ready, before we could attach an application listener. */
+export function sceneControlsRendered(app) {
+  if (!initialized || !app || app !== ui.controls) return;
+  attachSceneControlEvents();
+  if (startupSceneReplayPending) queueStartupSceneReplay(app);
+}
+
 export function attachSceneControlEvents() {
   const controls = ui.controls;
-  if (!controls?.addEventListener) return;
+  if (!controls?.addEventListener || attachedSceneControls.has(controls)) return;
+  attachedSceneControls.add(controls);
   controls.addEventListener("render", () => {
     try { applySceneDomVisibility(); } catch (error) { warn("Scene DOM visibility failed", error); }
+    if (controls !== ui.controls) return;
+    if (startupSceneReplayPending) {
+      queueStartupSceneReplay(controls);
+      return;
+    }
     if (sceneRefreshPending) return;
     queueMicrotask(() => {
       if (sceneRefreshPending || controls !== ui.controls) return;
@@ -332,9 +392,9 @@ export function attachSceneControlEvents() {
 
 export function attachSidebarEvents() {
   const sidebar = ui.sidebar;
-  if (!sidebar?.addEventListener) return;
+  if (!sidebar?.addEventListener || attachedSidebars.has(sidebar)) return;
+  attachedSidebars.add(sidebar);
   sidebar.addEventListener("render", () => {
-    // Resolve from the next microtask in case other module render hooks add tabs.
     queueMicrotask(() => {
       try { applyRightOrder(); } catch (error) { warn("Sidebar render ordering failed", error); }
     });
@@ -342,6 +402,8 @@ export function attachSidebarEvents() {
 }
 
 export function sidebarRendered() {
+  // A sidebar application may not exist during ready. Attach when rendered.
+  attachSidebarEvents();
   queueMicrotask(() => {
     try { applyRightOrder(); } catch (error) { warn("Sidebar tab ordering failed", error); }
   });

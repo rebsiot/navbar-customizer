@@ -9,7 +9,7 @@ import {
 } from "./appearance.mjs";
 import {
   MODULE_ID, SETTING_KEY, initializeLayoutFromSettings,
-  settingsChanged, updateSceneControls, finalizeSceneControlButtons, sidebarRendered, attachSidebarEvents, attachSceneControlEvents, applyLayoutToUI
+  settingsChanged, updateSceneControls, finalizeSceneControlButtons, sidebarRendered, attachSidebarEvents, attachSceneControlEvents, initializeStartupOrder, startupCanvasReady, sceneControlsRendered, applyLayoutToUI
 } from "./runtime.mjs";
 
 Hooks.once("init", () => {
@@ -79,14 +79,20 @@ Hooks.once("init", () => {
 
 Hooks.on("getSceneControlButtons", updateSceneControls);
 Hooks.on("renderSidebar", sidebarRendered);
+Hooks.on("canvasReady", startupCanvasReady);
+Hooks.on("renderSceneControls", sceneControlsRendered);
 
 Hooks.once("ready", () => {
   // A late pass catches tools which other modules register after our first hook.
   Hooks.on("getSceneControlButtons", finalizeSceneControlButtons);
-  attachSceneControlEvents();
-  initializeLayoutFromSettings();
+  // Read both user preferences before asking Foundry to render anything.
+  // Previous versions triggered two early resets while the initial Scene was
+  // still loading, so the visible order could remain native until a refresh.
+  initializeLayoutFromSettings({ apply: false });
   initializeAppearanceFromSettings();
-  initializeVisibilityFromSettings(applyLayoutToUI);
+  initializeVisibilityFromSettings(applyLayoutToUI, { apply: false });
+  attachSceneControlEvents();
   attachSidebarEvents();
-  console.info(`${MODULE_ID} | v0.1.9 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
+  initializeStartupOrder();
+  console.info(`${MODULE_ID} | v0.1.10 loaded. Open Configure Settings > Module Settings > AFT Navbar+ > Arrange Icon Order or Change Colors.`);
 });

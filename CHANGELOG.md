@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.10 — 2026-10-18 (beta first-login order)
+
+- Fixed saved toolbar/subtool ordering being ignored when first joining a game until the player refreshed the browser or switched scenes. Previous initialization could ask an unrendered Foundry v14 SceneControls app to refresh too early.
+- Load the saved per-user layout and Hide/Show settings together before starting the first UI replay. If the native controls have not rendered, wait for their first completed render, then apply the saved order once with a guarded reset.
+- Also resynchronize when Foundry creates a new SceneControls application or finishes loading a scene, and apply right-sidebar tab order on late sidebar renders; prevent duplicate listeners and recursive initial rerenders.
+- No unnecessary initial redraw for users with default toolbar/visibility preferences. Preserve native control callbacks, saved colors, hiding permissions, IDs and world documents.
+- Added startup regression tests for pre-ready native renders, late sidebar creation, replaced controls applications, default preferences, and one-shot replay. Automated/mocked only; live Foundry confirmation pending.
+
 ## 0.1.9 — 2026-10-18 (beta player visibility)
 
 - Fixed a player-facing Hide/Show rendering gap: saved preferences could change the organizer to **Hidden** while module-added toolbar icons remained visible because other modules changed the prepared controls afterward.

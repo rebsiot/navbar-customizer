@@ -1,25 +1,28 @@
-# AFT Navbar+ v0.1.9 (Beta) — Player Hide/Show visibility
+# AFT Navbar+ v0.1.10 (Beta) — Saved order applies on first login
 
-## Fix
+Your saved left-toolbar and right-sidebar arrangement should now appear when you enter a Foundry game, without refreshing the browser or switching Scenes.
 
-Player and Trusted Player Hide/Show preferences now have an additional client-side rendering pass so that an icon marked **Hidden** is also concealed from that player's Foundry navigation UI, even when a subsequent addon overwrites the native toolbar visibility flag. The original native visibility hooks remain in place, and a late hook pass also applies preferences to tools registered after AFT Navbar+.
+## What's changed
 
-This is **visual customization**, not a module disable feature or a permissions control. Each user's saved `visibility` choice remains independent. Other player/GM layouts, color settings, world documents and installed module IDs are unchanged. The native Settings sidebar tab is still protected against hiding.
+- Waits for Foundry's first completed SceneControls render before replaying saved left-toolbar and subtool order when the controls weren't ready at login.
+- Applies saved right-sidebar tab order when the sidebar is first created or rendered, even if that happens after the module's ready hook.
+- Handles native SceneControls applications created or replaced during initial scene loading, with a one-time guarded replay instead of recurring refreshes.
+- Avoids unnecessary startup rerenders when the user has no saved toolbar/Hide preferences.
 
-## Install / update
+## Install / upgrade
 
-Use **Foundry Setup → Add-on Modules → Update** if your installed version is v0.1.5 or later. The permanent manifest does not change:
+With v0.1.5 or newer installed, use **Foundry Setup > Add-on Modules > Update**. The permanent manifest remains:
 
 `https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json`
 
-For a manual update, back up `Data/modules/foundry-nav-order` (or `Z:\Data\modules\foundry-nav-order`), stop Foundry, replace the existing folder contents with the full `foundry-nav-order-0.1.9.zip` and restart. Do not rename the module folder. Older version-pinned manifests require a one-time transition as described in README.
+For manual installation, back up `Data/modules/foundry-nav-order`, stop Foundry, then replace the folder contents with the complete `foundry-nav-order-0.1.10.zip` (module.json at the folder root), restart Foundry and reload the browser. Do not rename the folder or module ID. A pinned-manifest installation older than v0.1.5 needs this one-time manual transition.
 
-## Verification and limitations
+Existing user preferences for ordering, visibility and colors and the GM hide-role setting remain unchanged. No Foundry Actors, Scenes, Journals, macros, hotbar slots, or world documents are migrated.
 
-Mock tests cover ordinary and Trusted Players; native and late-added categories/tools; a later addon overwriting `visible`; reversible rendering; active sidebar-tab handling; GM access revocation and failed saves. Real Foundry v14 player-browser acceptance is **not yet confirmed**. Addons that inject entirely custom toolbar DOM without Foundry's native data identifiers may still require compatibility work. Do not interpret passing mock tests as live deployment.
+## Verification and rollback
 
-**First live test:** Log in as a non-GM Player while the GM has selected **All Players** under **Who Can Hide Icons**. Use **AFT Navbar+ → Arrange Icon Order** to hide an addon toolbar subtool; verify it disappears immediately, survives refresh, and returns on Show. Repeat with a Trusted Player if using the Trusted Players threshold.
+Automated tests simulate Foundry v14 startup timing, including a toolbar rendered before ready, a sidebar created afterward, replacement controls applications and uncustomized defaults. Real Foundry v14 login testing is still required. UI replacement modules can behave differently.
 
-**Rollback:** Restore the backed-up complete module folder or install the [v0.1.8 ZIP](https://github.com/rebsiot/navbar-customizer/releases/tag/v0.1.8). No world-data migration. Saved settings remain under the same keys.
+To roll back, disable AFT Navbar+ and reload for Foundry defaults, or restore the previous saved module folder or the complete v0.1.9 ZIP. Existing user settings remain in place; this release does not migrate world data.
 
-Source and issues: https://github.com/rebsiot/navbar-customizer
+Source, prior releases and issues: https://github.com/rebsiot/navbar-customizer
