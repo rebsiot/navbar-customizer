@@ -8,7 +8,7 @@ const manifest = JSON.parse(read("module.json"));
 test("Foundry identifies this existing module as AFT Navbar+", () => {
   assert.equal(manifest.id, "foundry-nav-order");
   assert.equal(manifest.title, "AFT Navbar+");
-  assert.equal(manifest.version, "0.1.8");
+  assert.equal(manifest.version, "0.1.9");
   assert.equal(manifest.manifest, "https://raw.githubusercontent.com/rebsiot/navbar-customizer/update-channel/module.json");
 });
 
